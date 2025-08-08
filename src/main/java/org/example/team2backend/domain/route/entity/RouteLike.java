@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.team2backend.domain.user.entity.User;
+import org.example.team2backend.global.entity.BaseEntity;
 
 @Entity
 @Getter
@@ -13,7 +14,7 @@ import org.example.team2backend.domain.user.entity.User;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "route_like")
-public class RouteLike {
+public class RouteLike extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
