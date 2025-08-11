@@ -6,10 +6,7 @@ import org.example.team2backend.domain.review.service.command.ReviewCommandServi
 import org.example.team2backend.domain.review.service.query.ReviewQueryService;
 import org.example.team2backend.global.apiPayload.CustomResponse;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -28,4 +25,8 @@ public class ReviewController {
         return CustomResponse.onSuccess(reviewCommandService.createReview(content, images));
     }
 
+    @GetMapping("/{routeId}")
+    public CustomResponse<List<ReviewResponseDTO.ReviewResDTO>> getReviews(@PathVariable Long routeId){
+        return CustomResponse.onSuccess(reviewQueryService.getReviews(routeId));
+    }
 }

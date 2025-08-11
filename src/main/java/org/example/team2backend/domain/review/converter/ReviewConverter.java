@@ -4,6 +4,8 @@ import org.example.team2backend.domain.review.dto.response.ReviewResponseDTO;
 import org.example.team2backend.domain.review.entity.Review;
 import org.example.team2backend.domain.review.entity.ReviewImage;
 
+import java.util.List;
+
 
 public class ReviewConverter {
 
@@ -25,6 +27,21 @@ public class ReviewConverter {
         return ReviewResponseDTO.ReviewCreateResDTO.builder()
                 .reviewId(review.getId())
                 .createdAt(review.getCreatedAt())
+                .build();
+    }
+
+    public static ReviewResponseDTO.ReviewResDTO toReviewResDTO(Review review, List<ReviewImage> reviewImages) {
+        return ReviewResponseDTO.ReviewResDTO.builder()
+                .reviewId(review.getId())
+                .content(review.getContent())
+                .images(reviewImages.stream()
+                        .map(ReviewImage::getImageUrl)
+                        .toList())
+                .createdAt(review.getCreatedAt())
+                .author(ReviewResponseDTO.AuthorDTO.builder()
+                        .userId(review.getUser().getId())
+                        .nickname(review.getUser().getNickname())
+                        .build())
                 .build();
     }
 }
