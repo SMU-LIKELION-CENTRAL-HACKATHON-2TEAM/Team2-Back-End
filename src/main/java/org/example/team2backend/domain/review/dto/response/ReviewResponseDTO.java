@@ -29,5 +29,12 @@ public class ReviewResponseDTO {
             String nickname
     ) {}
 
+    @Builder
+    public record MyReviewResDTO(
+            Long reviewId,
+            String content,
+            List<String> images,
+            LocalDateTime createdAt
+    ) {}
 
 }

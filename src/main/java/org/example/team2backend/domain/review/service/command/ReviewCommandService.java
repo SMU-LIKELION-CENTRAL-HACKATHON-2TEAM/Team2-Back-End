@@ -5,14 +5,21 @@ import org.example.team2backend.domain.review.converter.ReviewConverter;
 import org.example.team2backend.domain.review.dto.response.ReviewResponseDTO;
 import org.example.team2backend.domain.review.entity.Review;
 import org.example.team2backend.domain.review.entity.ReviewImage;
+import org.example.team2backend.domain.review.entity.ReviewLike;
 import org.example.team2backend.domain.review.repository.ReviewImageRepository;
+import org.example.team2backend.domain.review.repository.ReviewLikeRepository;
 import org.example.team2backend.domain.review.repository.ReviewRepository;
+import org.example.team2backend.domain.user.entity.User;
+import org.example.team2backend.domain.user.repository.UserRepository;
+import org.example.team2backend.global.apiPayload.code.ReviewErrorCode;
+import org.example.team2backend.global.apiPayload.exception.ReviewException;
 import org.example.team2backend.global.s3.service.S3Service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +28,8 @@ public class ReviewCommandService {
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final S3Service s3Service;
+    private final UserRepository userRepository;
+    private final ReviewLikeRepository reviewLikeRepository;
 
     public ReviewResponseDTO.ReviewCreateResDTO createReview(String content, List<MultipartFile> images) {
 
@@ -44,5 +53,25 @@ public class ReviewCommandService {
         }
 
         return ReviewConverter.toReviewCreateResDTO(review);
+    }
+
+    public void toggleLike(Long reviewId, Long userId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ReviewException(ReviewErrorCode.REVIEW_NOT_FOUND));
+
+        User user = userRepository.findById(userId).get();
+        // TODO : 유저 관련 구현 시 주석 풀기
+//                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        Optional<ReviewLike> existingLike = reviewLikeRepository.findByReviewAndUser(review, user);
+
+        if (existingLike.isPresent()) {
+            // 이미 좋아요 → 취소
+            reviewLikeRepository.delete(existingLike.get());
+        } else {
+            // 좋아요 추가
+            ReviewLike reviewLike = ReviewConverter.toReviewLike(review, user);
+            reviewLikeRepository.save(reviewLike);
+        }
     }
 }

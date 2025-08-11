@@ -29,4 +29,17 @@ public class ReviewController {
     public CustomResponse<List<ReviewResponseDTO.ReviewResDTO>> getReviews(@PathVariable Long routeId){
         return CustomResponse.onSuccess(reviewQueryService.getReviews(routeId));
     }
+
+    @PostMapping("/{reviewId}")
+    public CustomResponse<?> likeReview(@PathVariable Long reviewId){
+        // TODO : 인가 완료되면 실제 user정보 넣기
+        reviewCommandService.toggleLike(reviewId, 1L);
+        return CustomResponse.onSuccess("리뷰 좋아요/취소가 완료됐습니다.");
+    }
+
+    @GetMapping("/me")
+    public CustomResponse<List<ReviewResponseDTO.MyReviewResDTO>> getMyReviews(){
+        // TODO : 인가 완료되면 실제 user정보 넣기
+        return CustomResponse.onSuccess(reviewQueryService.getMyReviews(1L));
+    }
 }
