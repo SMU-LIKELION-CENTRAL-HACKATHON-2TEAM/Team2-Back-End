@@ -51,4 +51,10 @@ public class ReviewController {
         reviewCommandService.updateReview(reviewId, 1L, content, images);
         return CustomResponse.onSuccess("리뷰 수정이 완료됐습니다.");
     }
+
+    @DeleteMapping("/{reviewId}")
+    public CustomResponse<String> deleteReview(@PathVariable Long reviewId){
+        reviewCommandService.deleteReview(reviewId, 1L);
+        return CustomResponse.onSuccess("리뷰 삭제가 완료됐습니다.");
+    }
 }

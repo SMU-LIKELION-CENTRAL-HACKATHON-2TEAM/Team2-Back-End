@@ -39,17 +39,8 @@ public class ReviewCommandService {
 
         // 2. 이미지 업로드 및 ReviewImage 저장
         if (images != null && !images.isEmpty()) {
-            if (images.size() > 3) {
-                throw new ReviewException(ReviewErrorCode.REVIEW_IMAGE_LIMIT);
-            }
-
-            images.stream().forEach(image -> {
-                String imageKey = s3Service.upload(image);
-                String imageUrl = s3Service.getFileUrl(imageKey);
-
-                ReviewImage reviewImage = ReviewConverter.toReviewImage(imageKey, imageUrl, review);
-                reviewImageRepository.save(reviewImage);
-            });
+            validateImageCount(images);
+            images.forEach(image -> saveReviewImage(image, review));
         }
 
         return ReviewConverter.toReviewCreateResDTO(review);
@@ -79,37 +70,44 @@ public class ReviewCommandService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ReviewException(ReviewErrorCode.REVIEW_NOT_FOUND));
 
-        // TODO : User 완료 되면 작성자 본인 확인
-//        if (!review.getUser().getId().equals(userId)) {
-//            throw new ReviewException(ReviewErrorCode.REVIEW_ACCESS_DENIED);
-//        }
+        validateReviewUser(review, userId);
 
         // 내용 수정
         review.updateReview(content);
 
         // 기존 이미지 삭제 + S3에서 제거
         List<ReviewImage> existingImages = reviewImageRepository.findByReview(review);
-        existingImages.forEach(img -> {
+        existingImages.stream().forEach(img -> {
             s3Service.deleteFile(img.getImageKey());
             reviewImageRepository.delete(img);
         });
 
         // 새 이미지 업로드
         if (images != null && !images.isEmpty()) {
-            if (images.size() > 3) {
-                throw new ReviewException(ReviewErrorCode.REVIEW_IMAGE_LIMIT);
-            }
-
-            images.forEach(image -> {
-                String imageKey = s3Service.upload(image);
-                String imageUrl = s3Service.getFileUrl(imageKey);
-
-                ReviewImage reviewImage = ReviewConverter.toReviewImage(imageKey, imageUrl, review);
-                reviewImageRepository.save(reviewImage);
-            });
+            validateImageCount(images);
+            images.forEach(image -> saveReviewImage(image, review));
         }
     }
 
+
+    public void deleteReview(Long reviewId, Long userId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ReviewException(ReviewErrorCode.REVIEW_NOT_FOUND));
+
+        // 작성자 본인 확인
+        validateReviewUser(review, userId);
+
+        // 이미지 삭제
+        List<ReviewImage> images = reviewImageRepository.findByReview(review);
+        images.forEach(img -> s3Service.deleteFile(img.getImageKey()));
+        reviewImageRepository.deleteAll(images);
+
+        // 좋아요 삭제
+        reviewLikeRepository.deleteByReview(review);
+
+        // 리뷰 삭제
+        reviewRepository.delete(review);
+    }
 
 
     private void saveReviewImage(MultipartFile image, Review review) {
@@ -125,4 +123,11 @@ public class ReviewCommandService {
             throw new ReviewException(ReviewErrorCode.REVIEW_IMAGE_LIMIT);
         }
     }
+
+    private void validateReviewUser(Review review, Long userId) {
+        if (!review.getUser().getId().equals(userId)){
+            throw new ReviewException(ReviewErrorCode.REVIEW_ACCESS_DENIED);
+        }
+    }
+
 }
