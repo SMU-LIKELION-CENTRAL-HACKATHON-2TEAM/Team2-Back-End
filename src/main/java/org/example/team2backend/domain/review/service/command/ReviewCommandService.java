@@ -40,16 +40,16 @@ public class ReviewCommandService {
         // 2. 이미지 업로드 및 ReviewImage 저장
         if (images != null && !images.isEmpty()) {
             if (images.size() > 3) {
-                throw new IllegalArgumentException("이미지는 최대 3개까지만 업로드할 수 있습니다.");
+                throw new ReviewException(ReviewErrorCode.REVIEW_IMAGE_LIMIT);
             }
 
-            for (MultipartFile image : images) {
+            images.stream().forEach(image -> {
                 String imageKey = s3Service.upload(image);
                 String imageUrl = s3Service.getFileUrl(imageKey);
 
                 ReviewImage reviewImage = ReviewConverter.toReviewImage(imageKey, imageUrl, review);
                 reviewImageRepository.save(reviewImage);
-            }
+            });
         }
 
         return ReviewConverter.toReviewCreateResDTO(review);
@@ -72,6 +72,57 @@ public class ReviewCommandService {
             // 좋아요 추가
             ReviewLike reviewLike = ReviewConverter.toReviewLike(review, user);
             reviewLikeRepository.save(reviewLike);
+        }
+    }
+
+    public void updateReview(Long reviewId, Long userId, String content, List<MultipartFile> images) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ReviewException(ReviewErrorCode.REVIEW_NOT_FOUND));
+
+        // TODO : User 완료 되면 작성자 본인 확인
+//        if (!review.getUser().getId().equals(userId)) {
+//            throw new ReviewException(ReviewErrorCode.REVIEW_ACCESS_DENIED);
+//        }
+
+        // 내용 수정
+        review.updateReview(content);
+
+        // 기존 이미지 삭제 + S3에서 제거
+        List<ReviewImage> existingImages = reviewImageRepository.findByReview(review);
+        existingImages.forEach(img -> {
+            s3Service.deleteFile(img.getImageKey());
+            reviewImageRepository.delete(img);
+        });
+
+        // 새 이미지 업로드
+        if (images != null && !images.isEmpty()) {
+            if (images.size() > 3) {
+                throw new ReviewException(ReviewErrorCode.REVIEW_IMAGE_LIMIT);
+            }
+
+            images.forEach(image -> {
+                String imageKey = s3Service.upload(image);
+                String imageUrl = s3Service.getFileUrl(imageKey);
+
+                ReviewImage reviewImage = ReviewConverter.toReviewImage(imageKey, imageUrl, review);
+                reviewImageRepository.save(reviewImage);
+            });
+        }
+    }
+
+
+
+    private void saveReviewImage(MultipartFile image, Review review) {
+        String imageKey = s3Service.upload(image);
+        String imageUrl = s3Service.getFileUrl(imageKey);
+
+        ReviewImage reviewImage = ReviewConverter.toReviewImage(imageKey, imageUrl, review);
+        reviewImageRepository.save(reviewImage);
+    }
+
+    private void validateImageCount(List<MultipartFile> images) {
+        if (images.size() > 3) {
+            throw new ReviewException(ReviewErrorCode.REVIEW_IMAGE_LIMIT);
         }
     }
 }

@@ -34,7 +34,8 @@ public class ReviewResponseDTO {
             Long reviewId,
             String content,
             List<String> images,
-            LocalDateTime createdAt
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt
     ) {}
 
 }

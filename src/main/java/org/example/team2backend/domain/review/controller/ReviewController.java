@@ -31,7 +31,7 @@ public class ReviewController {
     }
 
     @PostMapping("/{reviewId}")
-    public CustomResponse<?> likeReview(@PathVariable Long reviewId){
+    public CustomResponse<String> likeReview(@PathVariable Long reviewId){
         // TODO : 인가 완료되면 실제 user정보 넣기
         reviewCommandService.toggleLike(reviewId, 1L);
         return CustomResponse.onSuccess("리뷰 좋아요/취소가 완료됐습니다.");
@@ -41,5 +41,14 @@ public class ReviewController {
     public CustomResponse<List<ReviewResponseDTO.MyReviewResDTO>> getMyReviews(){
         // TODO : 인가 완료되면 실제 user정보 넣기
         return CustomResponse.onSuccess(reviewQueryService.getMyReviews(1L));
+    }
+
+    @PatchMapping(value = "/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public CustomResponse<String> updateReview(
+            @RequestPart(value = "content", required = false) String content,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images,
+            @PathVariable Long reviewId){
+        reviewCommandService.updateReview(reviewId, 1L, content, images);
+        return CustomResponse.onSuccess("리뷰 수정이 완료됐습니다.");
     }
 }

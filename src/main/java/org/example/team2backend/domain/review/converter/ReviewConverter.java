@@ -62,6 +62,7 @@ public class ReviewConverter {
                         .map(ReviewImage::getImageUrl)
                         .toList())
                 .createdAt(review.getCreatedAt())
+                .updatedAt(review.getUpdatedAt())
                 .build();
     }
 }
