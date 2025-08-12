@@ -15,6 +15,7 @@ import org.example.team2backend.global.security.auth.CustomUserDetails;
 import org.example.team2backend.global.security.auth.CustomUserDetailsService;
 import org.example.team2backend.global.security.jwt.JwtDTO;
 import org.example.team2backend.global.security.jwt.JwtUtil;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
@@ -33,9 +34,12 @@ public class MemberCommandService {
 
     private final TokenRepository tokenRepository;
 
-    public JwtDTO createUser (MemberReqDTO.LoginRequestDTO loginRequestDTO) {
-        Member member = MemberConverter.toMember(loginRequestDTO);
-        if (memberRepository.findByEmail(loginRequestDTO.email()).isEmpty()) {
+    public JwtDTO createUser(MemberReqDTO.SignUpRequestDTO signUpRequestDTO) {
+        Member member = MemberConverter.toMember(signUpRequestDTO);
+        if (!signUpRequestDTO.password().equals(signUpRequestDTO.confirmPassword())) {
+            throw new AuthException(AuthErrorCode.BAD_REQUEST_400);
+        }
+        if (memberRepository.findByEmail(signUpRequestDTO.email()).isEmpty()) {
             memberRepository.save(member);
         }
         return createJwt(member);

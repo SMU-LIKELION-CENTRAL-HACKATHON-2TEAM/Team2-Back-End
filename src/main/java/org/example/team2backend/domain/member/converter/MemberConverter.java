@@ -7,10 +7,11 @@ import org.example.team2backend.global.security.auth.Roles;
 
 public class MemberConverter {
 
-    public static Member toMember(MemberReqDTO.LoginRequestDTO loginRequestDTO) {
+    public static Member toMember(MemberReqDTO.SignUpRequestDTO signUpRequestDTO) {
         return Member.builder()
-                .email(loginRequestDTO.email())
-                .password(loginRequestDTO.password())
+                .email(signUpRequestDTO.email())
+                .password(signUpRequestDTO.password())
+                .nickname(signUpRequestDTO.nickname())
                 .role(Roles.ROLE_USER)
                 .socialType(SocialType.CUSTOM)
                 .build();

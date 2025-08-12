@@ -39,9 +39,9 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
         log.info("[ Login Filter ]  로그인 시도 : Custom Login Filter 작동 ");
         ObjectMapper objectMapper = new ObjectMapper();
-        MemberReqDTO.LoginRequestDTO requestBody;
+        MemberReqDTO.SignUpRequestDTO requestBody;
         try {
-            requestBody = objectMapper.readValue(request.getInputStream(), MemberReqDTO.LoginRequestDTO.class);
+            requestBody = objectMapper.readValue(request.getInputStream(), MemberReqDTO.SignUpRequestDTO.class);
         } catch (IOException e) {
             throw new AuthException(AuthErrorCode.NOT_FOUND_404);
         }

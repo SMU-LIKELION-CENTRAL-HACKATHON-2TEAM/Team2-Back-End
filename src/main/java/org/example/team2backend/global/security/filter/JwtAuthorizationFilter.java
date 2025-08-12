@@ -87,12 +87,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         CustomUserDetails userDetails = (CustomUserDetails)customUserDetailsService.loadUserByUsername(email);
 
-        /*CustomUserDetails userDetails = new CustomUserDetails(
-                jwtUtil.getEmail(accessToken),
-                null,
-                jwtUtil.getRoles(accessToken)
-        );*/
-
         log.info("[ JwtAuthorizationFilter ] UserDetails 객체 생성 성공");
 
         // 3. 인증 객체 생성 및 SecurityContextHolder에 저장

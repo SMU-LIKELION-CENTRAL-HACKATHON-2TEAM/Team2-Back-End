@@ -26,9 +26,9 @@ public class MemberController {
 
     @Operation(summary = "회원가입 API", description = "회원가입 API 입니다.")
     @PostMapping("/users")
-    public CustomResponse<?> createUser(@RequestBody MemberReqDTO.LoginRequestDTO loginReqDTO) {
+    public CustomResponse<?> createUser(@RequestBody MemberReqDTO.SignUpRequestDTO signUpRequestDTO) {
 
-        return CustomResponse.onSuccess(memberCommandService.createUser(loginReqDTO));
+        return CustomResponse.onSuccess(memberCommandService.createUser(signUpRequestDTO));
     }
 
     @Operation(summary = "토큰 재발급 API", description = "토큰 재발급 API 입니다.")
@@ -39,5 +39,4 @@ public class MemberController {
 
         return CustomResponse.onSuccess(memberCommandService.reissueToken(jwtDTO));
     }
-
 }
