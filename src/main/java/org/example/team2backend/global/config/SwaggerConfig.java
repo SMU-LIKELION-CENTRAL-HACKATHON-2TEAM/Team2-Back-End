@@ -17,8 +17,8 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI LikeLionAPI() {
         Info info = new Info()
-                .title("Focus Coach API") // API 제목
-                .description("Focus Coach API 명세서 입니다.") // 설명
+                .title("IEUM API") // API 제목
+                .description("이음 API 명세서 입니다.") // 설명
                 .version("1.0.0"); //버전
 
         String jwtSchemeName = "JWT TOKEN";
