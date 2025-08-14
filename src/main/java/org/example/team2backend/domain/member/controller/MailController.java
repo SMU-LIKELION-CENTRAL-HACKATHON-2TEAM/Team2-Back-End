@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.team2backend.domain.member.dto.request.MemberReqDTO;
 import org.example.team2backend.domain.member.service.command.MailCommandService;
-import org.example.team2backend.domain.member.service.command.MemberCommandService;
 import org.example.team2backend.domain.member.service.query.MemberQueryService;
 import org.example.team2backend.global.apiPayload.CustomResponse;
 import org.springframework.web.bind.annotation.*;

@@ -77,7 +77,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 // cors
                 .cors(cors -> cors.configurationSource(corsConfigurationSource));
-        ;
+
 
         //최종 SecurityFilterChain 객체 생성
         return http.build();
