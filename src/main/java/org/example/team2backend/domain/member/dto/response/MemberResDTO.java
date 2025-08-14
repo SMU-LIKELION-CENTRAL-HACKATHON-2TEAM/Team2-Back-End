@@ -6,4 +6,8 @@ public class MemberResDTO {
             String email,
             String nickname
     ) {}
+
+    public record MailResponseDTO (
+            String code
+    ) {}
 }

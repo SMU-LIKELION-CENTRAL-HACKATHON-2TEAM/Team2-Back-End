@@ -16,4 +16,13 @@ public class MemberReqDTO {
     public record UpdatePasswordDTO(
             String newPassword
     ) {}
+
+    public record MailRequestDTO(
+            String email
+    ) {}
+
+    public record VerifyRequestDTO(
+            String userCode, //입력된 코드
+            String verificationCode //발급된 코드
+    ) {}
 }

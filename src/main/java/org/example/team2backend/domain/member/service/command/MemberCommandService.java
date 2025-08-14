@@ -93,11 +93,27 @@ public class MemberCommandService {
                 .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
         if (member.getPassword().equals(newPassword)) {
-            throw new CustomException(SAME_VALUE);
+            throw new CustomException(PASSWORD_UNCHANGED);
         }
 
         memberRepository.updatePasswordByEmail(email, newPassword);
     }
+
+    //인증 코드 변경
+    /*public void updateCode(MemberReqDTO.MailRequestDTO mailRequestDTO,
+                           String code) {
+
+        String email = mailRequestDTO.email();
+
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
+
+        if (member.getVerificationCode().equals(code)) {
+            throw new CustomException(SAME_VALUE);
+        }
+
+        memberRepository.updateCodeByEmail(email, code);
+    }*/
 
     //Jwt 생성
     public JwtDTO createJwt(Member member) {

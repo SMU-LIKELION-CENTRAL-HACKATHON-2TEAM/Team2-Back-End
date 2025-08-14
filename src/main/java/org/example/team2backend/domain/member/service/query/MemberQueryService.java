@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
 import static org.example.team2backend.domain.member.exception.MemberErrorCode.MEMBER_NOT_FOUND;
+import static org.example.team2backend.domain.member.exception.MemberErrorCode.VERIFICATION_CODE_MISMATCH;
 
 @Slf4j
 @Service
@@ -31,7 +32,17 @@ public class MemberQueryService {
                 .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
         return new MemberResDTO.MemberResponseDTO(email, member.getNickname());
+    }
 
+    //인증 코드 일치 여부 검사
+    public void verifyCode(MemberReqDTO.VerifyRequestDTO verifyRequestDTO) {
 
+        String code = verifyRequestDTO.userCode();
+
+        String verificationCode = verifyRequestDTO.verificationCode(); //사용자가 입력한 인증코드
+
+        if (!code.equals(verificationCode)) {
+            throw new CustomException(VERIFICATION_CODE_MISMATCH);
+        }
     }
 }

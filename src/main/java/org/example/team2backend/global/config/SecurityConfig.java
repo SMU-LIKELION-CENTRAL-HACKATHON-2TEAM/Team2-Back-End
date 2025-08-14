@@ -43,7 +43,7 @@ public class SecurityConfig {
             "/api/usage", //사용량 측정
             "/swagger-ui/**",   // swagger 관련 URL
             "/v3/api-docs/**", // swagger api 문서
-            "/api/v1/emails" //이메일 관련 api
+            "/api/v1/emails/**" //이메일 관련 api
     };
 
     @Bean
