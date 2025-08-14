@@ -6,26 +6,27 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.team2backend.domain.member.dto.request.MemberReqDTO;
 import org.example.team2backend.domain.member.service.command.MemberCommandService;
+import org.example.team2backend.domain.member.service.query.MemberQueryService;
 import org.example.team2backend.global.apiPayload.CustomResponse;
+import org.example.team2backend.global.security.auth.CustomUserDetails;
 import org.example.team2backend.global.security.jwt.JwtDTO;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.SignatureException;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/members")
 @Tag(name = "Email Login", description = "이메일 로그인 관련 API by 한민")
 public class MemberController {
 
     private final MemberCommandService memberCommandService;
+    private final MemberQueryService memberQueryService;
 
     @Operation(summary = "회원가입 API", description = "회원가입 API 입니다.")
-    @PostMapping("/users")
+    @PostMapping("")
     public CustomResponse<?> createUser(@RequestBody MemberReqDTO.SignUpRequestDTO signUpRequestDTO) {
 
         return CustomResponse.onSuccess(memberCommandService.createUser(signUpRequestDTO));
@@ -35,8 +36,54 @@ public class MemberController {
     @PostMapping("/reissue")
     public CustomResponse<?> reissueToken(@RequestBody JwtDTO jwtDTO) throws SignatureException {
 
-        log.info("[ Google Login Controller ] 토큰을 재발급 합니다.");
+        log.info("[ Member Controller ] 토큰을 재발급 합니다.");
 
         return CustomResponse.onSuccess(memberCommandService.reissueToken(jwtDTO));
     }
+
+    @Operation(summary = "사용자 기본 정보 조회", description = "사용자 기본 정보 조회 API 입니다.")
+    @GetMapping("/me")
+    public CustomResponse<?> showUserInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        log.info("[ Member Controller ] 사용자의 정보를 조회합니다.");
+
+        return CustomResponse.onSuccess(memberQueryService.showMemberInfo(userDetails));
+    }
+
+    @Operation(summary = "로그아웃", description = "로그아웃 API 입니다.")
+    @PostMapping("/me")
+    public CustomResponse<?> logout(@AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        log.info("[ Member Controller ] 로그아웃");
+
+        memberCommandService.logout(userDetails);
+
+        return CustomResponse.onSuccess("로그아웃 완료");
+    }
+
+    @Operation(summary = "사용자 닉네임 변경", description = "사용자 닉네임 변경 API 입니다.")
+    @PatchMapping("/me/nickname")
+    public CustomResponse<?> updateNickname(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                            @RequestBody MemberReqDTO.UpdateNicknameDTO updateNicknameDTO) {
+
+        log.info("[ Member Controller ] 사용자 닉네임 변경");
+
+        memberCommandService.updateNickname(userDetails, updateNicknameDTO);
+
+        return CustomResponse.onSuccess("닉네임 변경 완료");
+    }
+
+    @Operation(summary = "사용자 비밀번호 변경", description = "사용자 비밀번호 변경 API 입니다.")
+    @PatchMapping("/me/password")
+    public CustomResponse<?> updatePassword(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                            @RequestBody MemberReqDTO.UpdatePasswordDTO updatePasswordDTO) {
+
+        log.info("[ Member Controller ] 사용자 패스워드 변경");
+
+        memberCommandService.updatePassword(userDetails, updatePasswordDTO);
+
+        return CustomResponse.onSuccess("패스워드 수정 완료");
+    }
+
+
 }

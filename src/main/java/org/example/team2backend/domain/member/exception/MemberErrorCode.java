@@ -1,0 +1,19 @@
+package org.example.team2backend.domain.member.exception;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.example.team2backend.global.apiPayload.code.BaseErrorCode;
+import org.springframework.http.HttpStatus;
+
+@Getter
+@AllArgsConstructor
+public enum MemberErrorCode implements BaseErrorCode {
+
+    SAME_VALUE(HttpStatus.BAD_REQUEST, "MEMBER400_1", "변경값이 동일합니다."),
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER404_1", "회원을 찾을 수 없습니다."),
+    PASSWORD_UNCHANGED(HttpStatus.CONFLICT, "MEMBER409_1", "새 비밀번호가 기존 비밀번호와 같습니다.");
+
+    private final HttpStatus httpStatus;
+    private final String code;
+    private final String message;
+}

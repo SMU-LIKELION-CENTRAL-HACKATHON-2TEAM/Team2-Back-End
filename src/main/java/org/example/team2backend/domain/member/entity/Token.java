@@ -18,6 +18,6 @@ public class Token {
 
     @OneToOne
     @Setter
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "member_id")
     private Member member;
 }

@@ -99,5 +99,4 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authToken);
         log.info("[ JwtAuthorizationFilter ] 인증 객체 저장 완료");
     }
-
 }

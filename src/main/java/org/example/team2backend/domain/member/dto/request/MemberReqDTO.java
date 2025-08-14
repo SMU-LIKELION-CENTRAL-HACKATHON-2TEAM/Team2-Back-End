@@ -8,4 +8,12 @@ public class MemberReqDTO {
             String confirmPassword,
             String nickname
     ) {}
+
+    public record UpdateNicknameDTO(
+            String newNickname
+    ) {}
+
+    public record UpdatePasswordDTO(
+            String newPassword
+    ) {}
 }

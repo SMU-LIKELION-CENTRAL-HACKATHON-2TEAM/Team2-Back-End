@@ -10,16 +10,18 @@ import org.example.team2backend.domain.member.entity.Member;
 import org.example.team2backend.domain.member.repository.TokenRepository;
 import org.example.team2backend.domain.member.repository.MemberRepository;
 import org.example.team2backend.global.apiPayload.code.AuthErrorCode;
+import org.example.team2backend.global.apiPayload.exception.CustomException;
 import org.example.team2backend.global.security.auth.AuthException;
 import org.example.team2backend.global.security.auth.CustomUserDetails;
 import org.example.team2backend.global.security.auth.CustomUserDetailsService;
 import org.example.team2backend.global.security.jwt.JwtDTO;
 import org.example.team2backend.global.security.jwt.JwtUtil;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
 import java.security.SignatureException;
+
+import static org.example.team2backend.domain.member.exception.MemberErrorCode.*;
 
 @Slf4j
 @Service
@@ -30,10 +32,9 @@ public class MemberCommandService {
 
     private final JwtUtil jwtUtil;
 
-    private final UserDetailsService userDetailsService;
-
     private final TokenRepository tokenRepository;
 
+    //회원 가입(생성)
     public JwtDTO createUser(MemberReqDTO.SignUpRequestDTO signUpRequestDTO) {
         Member member = MemberConverter.toMember(signUpRequestDTO);
         if (!signUpRequestDTO.password().equals(signUpRequestDTO.confirmPassword())) {
@@ -43,6 +44,57 @@ public class MemberCommandService {
             memberRepository.save(member);
         }
         return createJwt(member);
+    }
+
+    //로그아웃
+    public void logout(@AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        String email = userDetails.getUsername();
+
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
+
+        int deletedCount = tokenRepository.deleteByEmail(email);
+
+        if (deletedCount == 0) {
+            log.warn("[ Logout ]삭제할 토큰이 존재하지 않습니다.");
+        } else {
+            log.info("[ Logout ] 로그아웃이 완료되었습니다.");
+        }
+    }
+
+    public void updateNickname(@AuthenticationPrincipal CustomUserDetails userDetails,
+                               MemberReqDTO.UpdateNicknameDTO updateNicknameDTO) {
+
+        String email = userDetails.getUsername();
+
+        String newNickname = updateNicknameDTO.newNickname();
+
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
+
+        if (!member.getNickname().equals(newNickname)) {
+            throw new CustomException(SAME_VALUE);
+        }
+
+        memberRepository.updateNicknameByEmail(email, newNickname);
+    }
+
+    public void updatePassword(@AuthenticationPrincipal CustomUserDetails userDetails,
+                               MemberReqDTO.UpdatePasswordDTO updatePasswordDTO) {
+
+        String email = userDetails.getUsername();
+
+        String newPassword = updatePasswordDTO.newPassword();
+
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
+
+        if (!member.getPassword().equals(newPassword)) {
+            throw new CustomException(SAME_VALUE);
+        }
+
+        memberRepository.updatePasswordByEmail(email, newPassword);
     }
 
     //Jwt 생성
