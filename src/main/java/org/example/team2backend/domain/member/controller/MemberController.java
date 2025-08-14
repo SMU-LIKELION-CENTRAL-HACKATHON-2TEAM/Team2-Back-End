@@ -1,6 +1,7 @@
 package org.example.team2backend.domain.member.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ import java.security.SignatureException;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/members")
-@Tag(name = "Email Login", description = "이메일 로그인 관련 API by 한민")
+@Tag(name = "Email Login", description = "일반 로그인 관련 API by 한민")
 public class MemberController {
 
     private final MemberCommandService memberCommandService;
@@ -32,6 +33,7 @@ public class MemberController {
         return CustomResponse.onSuccess(memberCommandService.createUser(signUpRequestDTO));
     }
 
+    @SecurityRequirement(name = "JWT TOKEN")
     @Operation(summary = "토큰 재발급 API", description = "토큰 재발급 API 입니다.")
     @PostMapping("/reissue")
     public CustomResponse<?> reissueToken(@RequestBody JwtDTO jwtDTO) throws SignatureException {
@@ -41,6 +43,7 @@ public class MemberController {
         return CustomResponse.onSuccess(memberCommandService.reissueToken(jwtDTO));
     }
 
+    @SecurityRequirement(name = "JWT TOKEN")
     @Operation(summary = "사용자 기본 정보 조회", description = "사용자 기본 정보 조회 API 입니다.")
     @GetMapping("/me")
     public CustomResponse<?> showUserInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -50,6 +53,7 @@ public class MemberController {
         return CustomResponse.onSuccess(memberQueryService.showMemberInfo(userDetails));
     }
 
+    @SecurityRequirement(name = "JWT TOKEN")
     @Operation(summary = "로그아웃", description = "로그아웃 API 입니다.")
     @PostMapping("/me")
     public CustomResponse<?> logout(@AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -61,6 +65,7 @@ public class MemberController {
         return CustomResponse.onSuccess("로그아웃 완료");
     }
 
+    @SecurityRequirement(name = "JWT TOKEN")
     @Operation(summary = "사용자 닉네임 변경", description = "사용자 닉네임 변경 API 입니다.")
     @PatchMapping("/me/nickname")
     public CustomResponse<?> updateNickname(@AuthenticationPrincipal CustomUserDetails userDetails,
@@ -73,6 +78,7 @@ public class MemberController {
         return CustomResponse.onSuccess("닉네임 변경 완료");
     }
 
+    @SecurityRequirement(name = "JWT TOKEN")
     @Operation(summary = "사용자 비밀번호 변경", description = "사용자 비밀번호 변경 API 입니다.")
     @PatchMapping("/me/password")
     public CustomResponse<?> updatePassword(@AuthenticationPrincipal CustomUserDetails userDetails,

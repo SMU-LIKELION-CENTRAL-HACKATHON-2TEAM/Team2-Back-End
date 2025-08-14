@@ -14,12 +14,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByEmail(@Param("email") String email);
 
     @Modifying
-    @Query("UPDATE Member m SET m.nickname = :newName WHERE m.email = :email")
+    @Query("UPDATE Member m SET m.nickname = :newNickname WHERE m.email = :email")
     int updateNicknameByEmail(@Param("email") String email,
-                            @Param("newNickname") String newNickName);
+                            @Param("newNickname") String newNickname);
 
     @Modifying
-    @Query("UPDATE Member m SET m.password = :newName WHERE m.email = :email")
+    @Query("UPDATE Member m SET m.password = :newPassword WHERE m.email = :email")
     int updatePasswordByEmail(@Param("email") String email,
                             @Param("newPassword") String newPassword);
 

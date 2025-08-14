@@ -63,6 +63,7 @@ public class MemberCommandService {
         }
     }
 
+    //닉네임 변경
     public void updateNickname(@AuthenticationPrincipal CustomUserDetails userDetails,
                                MemberReqDTO.UpdateNicknameDTO updateNicknameDTO) {
 
@@ -73,13 +74,14 @@ public class MemberCommandService {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
-        if (!member.getNickname().equals(newNickname)) {
+        if (member.getNickname().equals(newNickname)) {
             throw new CustomException(SAME_VALUE);
         }
 
         memberRepository.updateNicknameByEmail(email, newNickname);
     }
 
+    //패스워드 변경
     public void updatePassword(@AuthenticationPrincipal CustomUserDetails userDetails,
                                MemberReqDTO.UpdatePasswordDTO updatePasswordDTO) {
 
@@ -90,7 +92,7 @@ public class MemberCommandService {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
-        if (!member.getPassword().equals(newPassword)) {
+        if (member.getPassword().equals(newPassword)) {
             throw new CustomException(SAME_VALUE);
         }
 
