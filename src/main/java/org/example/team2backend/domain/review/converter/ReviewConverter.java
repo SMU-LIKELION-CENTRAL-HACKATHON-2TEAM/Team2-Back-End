@@ -5,8 +5,10 @@ import org.example.team2backend.domain.review.entity.Review;
 import org.example.team2backend.domain.review.entity.ReviewImage;
 import org.example.team2backend.domain.review.entity.ReviewLike;
 import org.example.team2backend.domain.user.entity.User;
+import org.springframework.data.domain.Slice;
 
 import java.util.List;
+import java.util.Map;
 
 
 public class ReviewConverter {
@@ -63,6 +65,44 @@ public class ReviewConverter {
                         .toList())
                 .createdAt(review.getCreatedAt())
                 .updatedAt(review.getUpdatedAt())
+                .build();
+    }
+
+    public static ReviewResponseDTO.CursorResDTO<ReviewResponseDTO.ReviewResDTO> toReviewSliceResponse(
+            Slice<Review> slice,
+            Map<Long, List<ReviewImage>> imageMap
+    ) {
+        List<ReviewResponseDTO.ReviewResDTO> dtos = slice.getContent().stream()
+                .map(review -> toReviewResDTO(review, imageMap.getOrDefault(review.getId(), List.of())))
+                .toList();
+
+        Long nextCursor = slice.hasNext()
+                ? slice.getContent().get(slice.getNumberOfElements() - 1).getId()
+                : null;
+
+        return ReviewResponseDTO.CursorResDTO.<ReviewResponseDTO.ReviewResDTO>builder()
+                .content(dtos)
+                .hasNext(slice.hasNext())
+                .nextCursor(nextCursor)
+                .build();
+    }
+
+    public static ReviewResponseDTO.CursorResDTO<ReviewResponseDTO.MyReviewResDTO> toMyReviewSliceResponse(
+            Slice<Review> slice,
+            Map<Long, List<ReviewImage>> imageMap
+    ) {
+        List<ReviewResponseDTO.MyReviewResDTO> dtos = slice.getContent().stream()
+                .map(review -> toMyReviewResDTO(review, imageMap.getOrDefault(review.getId(), List.of())))
+                .toList();
+
+        Long nextCursor = slice.hasNext()
+                ? slice.getContent().get(slice.getNumberOfElements() - 1).getId()
+                : null;
+
+        return ReviewResponseDTO.CursorResDTO.<ReviewResponseDTO.MyReviewResDTO>builder()
+                .content(dtos)
+                .hasNext(slice.hasNext())
+                .nextCursor(nextCursor)
                 .build();
     }
 }

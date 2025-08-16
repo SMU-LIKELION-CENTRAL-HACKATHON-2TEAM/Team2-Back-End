@@ -38,4 +38,11 @@ public class ReviewResponseDTO {
             LocalDateTime updatedAt
     ) {}
 
+
+    @Builder
+    public record CursorResDTO<T>(
+            List<T> content,
+            Boolean hasNext,
+            Long nextCursor
+    ) {}
 }

@@ -26,8 +26,11 @@ public class ReviewController {
     }
 
     @GetMapping("/{routeId}")
-    public CustomResponse<List<ReviewResponseDTO.ReviewResDTO>> getReviews(@PathVariable Long routeId){
-        return CustomResponse.onSuccess(reviewQueryService.getReviews(routeId));
+    public CustomResponse<ReviewResponseDTO.CursorResDTO<ReviewResponseDTO.ReviewResDTO>> getReviews(
+            @PathVariable Long routeId,
+            @RequestParam(required = false) Long cursor,
+            @RequestParam(defaultValue = "10") int size){
+        return CustomResponse.onSuccess(reviewQueryService.getReviews(routeId, cursor, size));
     }
 
     @PostMapping("/{reviewId}")
@@ -38,9 +41,12 @@ public class ReviewController {
     }
 
     @GetMapping("/me")
-    public CustomResponse<List<ReviewResponseDTO.MyReviewResDTO>> getMyReviews(){
+    public CustomResponse<ReviewResponseDTO.CursorResDTO<ReviewResponseDTO.MyReviewResDTO>> getMyReviews(
+            @RequestParam(required = false) Long cursor,
+            @RequestParam(defaultValue = "10") int size
+    ){
         // TODO : 인가 완료되면 실제 user정보 넣기
-        return CustomResponse.onSuccess(reviewQueryService.getMyReviews(1L));
+        return CustomResponse.onSuccess(reviewQueryService.getMyReviews(1L, cursor, size));
     }
 
     @PatchMapping(value = "/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

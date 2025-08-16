@@ -13,10 +13,15 @@ import org.example.team2backend.domain.user.entity.User;
 import org.example.team2backend.domain.user.repository.UserRepository;
 import org.example.team2backend.global.apiPayload.code.RouteErrorCode;
 import org.example.team2backend.global.apiPayload.exception.RouteException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,38 +32,47 @@ public class ReviewQueryService {
     private final RouteRepository routeRepository;
     private final UserRepository userRepository;
 
-    public List<ReviewResponseDTO.ReviewResDTO> getReviews(Long routeId) {
-        // 1. 루트 존재 확인
+    public ReviewResponseDTO.CursorResDTO<ReviewResponseDTO.ReviewResDTO> getReviews(Long routeId, Long cursor, int size) {
         Route route = routeRepository.findById(routeId)
                 .orElseThrow(() -> new RouteException(RouteErrorCode.ROUTE_NOT_FOUND));
 
-        // 2. 해당 루트의 리뷰 조회
-        List<Review> reviews = reviewRepository.findByRoute(route);
+        Pageable pageable = PageRequest.of(0, size);
+        Long effectiveCursorId = getEffectiveCursorId(cursor);
 
-        // 3. 각 리뷰에 대한 이미지 조회 후 DTO 변환
-        return reviews.stream()
-                .map(review -> {
-                    List<ReviewImage> reviewImages = reviewImageRepository.findByReview(review);
-                    return ReviewConverter.toReviewResDTO(review, reviewImages);
-                })
-                .toList();
+        Slice<Review> slice = reviewRepository
+                .findByRouteAndIdLessThanOrderByIdDesc(route, effectiveCursorId, pageable);
+
+        // 리뷰별 이미지 조회
+        Map<Long, List<ReviewImage>> imageMap = slice.getContent().stream()
+                .collect(Collectors.toMap(
+                        Review::getId,
+                        reviewImageRepository::findByReview
+                ));
+
+        return ReviewConverter.toReviewSliceResponse(slice, imageMap);
     }
 
-    public List<ReviewResponseDTO.MyReviewResDTO> getMyReviews(Long userId) {
-        // 1. 유저 확인
+    public ReviewResponseDTO.CursorResDTO<ReviewResponseDTO.MyReviewResDTO> getMyReviews(Long userId, Long cursor, int size) {
+        // TODO : User 부분 완성 시 구현
         User user = userRepository.findById(userId).get();
-                // TODO : User로직 완료되면 주석 풀기
-//                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+//                .orElseThrow(() -> new UserE(UserErrorCode.USER_NOT_FOUND));
 
-        // 2. 내가 쓴 리뷰 목록 조회
-        List<Review> myReviews = reviewRepository.findByUser(user);
+        Pageable pageable = PageRequest.of(0, size);
+        Long effectiveCursorId = getEffectiveCursorId(cursor);
 
-        // 3. DTO 변환
-        return myReviews.stream()
-                .map(review -> {
-                    List<ReviewImage> reviewImages = reviewImageRepository.findByReview(review);
-                    return ReviewConverter.toMyReviewResDTO(review, reviewImages);
-                })
-                .toList();
+        Slice<Review> slice = reviewRepository
+                .findByUserAndIdLessThanOrderByIdDesc(user, effectiveCursorId, pageable);
+
+        Map<Long, List<ReviewImage>> imageMap = slice.getContent().stream()
+                .collect(Collectors.toMap(
+                        Review::getId,
+                        reviewImageRepository::findByReview
+                ));
+
+        return ReviewConverter.toMyReviewSliceResponse(slice, imageMap);
+    }
+
+    private Long getEffectiveCursorId(Long cursorId) {
+        return (cursorId == null || cursorId == 0) ? Long.MAX_VALUE : cursorId;
     }
 }
