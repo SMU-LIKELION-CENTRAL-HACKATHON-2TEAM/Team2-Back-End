@@ -9,6 +9,11 @@ public class MemberReqDTO {
             String nickname
     ) {}
 
+    public record LoginRequestDTO(
+            String email,
+            String password
+    ) {}
+
     public record UpdateNicknameDTO(
             String newNickname
     ) {}

@@ -10,8 +10,12 @@ import java.util.Optional;
 
 public interface TokenRepository extends JpaRepository<Token, Long> {
 
+    //email을 기반으로 Token을 조회 후 반환
     @Query("SELECT m FROM Token m WHERE m.email = :email")
     Optional<Token> findByEmail(@Param("email") String email);
+
+    //Token이 존재하는 지 유무를 반환
+    boolean existsByToken(String refreshToken);
 
     @Modifying
     @Query("DELETE FROM Token m WHERE m.email = :email")

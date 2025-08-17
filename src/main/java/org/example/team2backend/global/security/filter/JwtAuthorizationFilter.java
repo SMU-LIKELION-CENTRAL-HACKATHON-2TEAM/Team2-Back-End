@@ -74,6 +74,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         }
     }
 
+    //accessToken 검증
     private void authenticateAccessToken(String accessToken) throws SignatureException {
         log.info("[ JwtAuthorizationFilter ] 토큰으로 인가 과정을 시작합니다. ");
 

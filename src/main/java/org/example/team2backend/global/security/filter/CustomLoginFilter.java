@@ -38,21 +38,24 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
             @NonNull HttpServletResponse response) throws AuthenticationException {
 
         log.info("[ Login Filter ]  로그인 시도 : Custom Login Filter 작동 ");
+        //Object Mapper 생성
         ObjectMapper objectMapper = new ObjectMapper();
+        //로그인 DTO 생성
         MemberReqDTO.SignUpRequestDTO requestBody;
         try {
+            //만든 DTO에 request의 값을 파싱해서 주입
             requestBody = objectMapper.readValue(request.getInputStream(), MemberReqDTO.SignUpRequestDTO.class);
         } catch (IOException e) {
             throw new AuthException(AuthErrorCode.NOT_FOUND_404);
         }
 
-        //Request Body 에서 추출
+        //Request Body 에서 이메일, 패스워드 추출
         String email = requestBody.email(); //Email 추출
         String password = requestBody.password(); //password 추출
         log.info("[ Login Filter ]  Email ---> {} ", email);
         log.info("[ Login Filter ]  Password ---> {} ", password);
 
-        //UserNamePasswordToken 생성 (인증용 객체)
+        //인증용 객체 생성
         UsernamePasswordAuthenticationToken authToken
                 = new UsernamePasswordAuthenticationToken(email, password, null);
 

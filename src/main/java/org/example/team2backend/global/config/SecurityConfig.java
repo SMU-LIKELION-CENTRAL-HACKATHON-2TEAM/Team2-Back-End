@@ -36,14 +36,11 @@ public class SecurityConfig {
 
     //인증이 필요하지 않은 url
     private final String[] allowUrl = {
-            "/api/login", //로그인 은 인증이 필요하지 않음
-            "/api/v1/members", // 회원가입은 인증이 필요하지 않음
-            "/auth/reissue", // 토큰 재발급은 인증이 필요하지 않음
-            "/auth/**", //기타 인증 관련 경로
-            "/api/usage", //사용량 측정
-            "/swagger-ui/**",   // swagger 관련 URL
-            "/v3/api-docs/**", // swagger api 문서
-            "/api/v1/emails/**" //이메일 관련 api
+            "/api/v1/members", //회원 가입
+            "/api/v1/members/login", //로그인
+            "/api/v1/emails", //이메일 인증
+            "/swagger-ui/**", //스웨거 관련 기능
+            "/v3/api-docs/**" //스웨거 관련 기능
     };
 
     @Bean
@@ -63,8 +60,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 //jwt인증 필터를 UsernamePasswordAuthenticationFilter 앞에 등록 -> 매 요청마다 jwt 유효성 검사하겠음
                 .addFilterBefore(new JwtAuthorizationFilter(jwtUtil, customUserDetailsService), UsernamePasswordAuthenticationFilter.class)
-                //로그인 필터 등록 -> 아이디, 비밀번호 검증 후 jwt 발급
-                .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
+                //로그인 필터 등록 -> 아이디, 비밀번호 검증 후 jwt 발급(지금은 스웨거 테스트 때문에 주석처리)
+                //.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
                 //기본 로그인 페이지 비활성화 (우리는 restapi로 처리하겠다.)
                 .formLogin(AbstractHttpConfigurer::disable)
                 //http basic 인증 비활성화

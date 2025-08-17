@@ -100,7 +100,7 @@ public class JwtUtil {
         Instant expiration = Instant.now().plusMillis(refreshExpMs);
         String refreshToken = tokenProvider(customUserDetails, expiration);
 
-
+        //refreshToken은 db에 저장
         tokenRepository.save(Token.builder()
                 .email(customUserDetails.getUsername())
                 .token(refreshToken)

@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.team2backend.domain.member.converter.MemberConverter;
 import org.example.team2backend.domain.member.dto.request.MemberReqDTO;
-import org.example.team2backend.domain.member.entity.Token;
 import org.example.team2backend.domain.member.entity.Member;
 import org.example.team2backend.domain.member.repository.TokenRepository;
 import org.example.team2backend.domain.member.repository.MemberRepository;
@@ -16,12 +15,13 @@ import org.example.team2backend.global.security.auth.CustomUserDetails;
 import org.example.team2backend.global.security.auth.CustomUserDetailsService;
 import org.example.team2backend.global.security.jwt.JwtDTO;
 import org.example.team2backend.global.security.jwt.JwtUtil;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
 import java.security.SignatureException;
 
-import static org.example.team2backend.domain.member.exception.MemberErrorCode.*;
+import static org.example.team2backend.domain.member.exception.MemberErrorCode.MEMBER_NOT_FOUND;
+import static org.example.team2backend.domain.member.exception.MemberErrorCode.PASSWORD_UNCHANGED;
+import static org.example.team2backend.domain.member.exception.MemberErrorCode.SAME_VALUE;
 
 @Slf4j
 @Service
@@ -34,25 +34,48 @@ public class MemberCommandService {
 
     private final TokenRepository tokenRepository;
 
+    private final CustomUserDetailsService userDetailsService;
+
     //회원 가입(생성)
-    public JwtDTO createUser(MemberReqDTO.SignUpRequestDTO signUpRequestDTO) {
+    public void createUser(MemberReqDTO.SignUpRequestDTO signUpRequestDTO) {
         Member member = MemberConverter.toMember(signUpRequestDTO);
+        //입력한 패스워드가 확인용 패스워드와 다르다면 예외 발생
         if (!signUpRequestDTO.password().equals(signUpRequestDTO.confirmPassword())) {
             throw new AuthException(AuthErrorCode.BAD_REQUEST_400);
         }
+        //이메일이 db에 없다면 추가 이미 있으면 예외 발생
         if (memberRepository.findByEmail(signUpRequestDTO.email()).isEmpty()) {
             memberRepository.save(member);
+        } else {
+            throw new AuthException(AuthErrorCode.BAD_REQUEST_400);
         }
-        return createJwt(member);
     }
 
+    //refreshToken을 바탕으로 토큰 재발급
+    public JwtDTO reissueToken(JwtDTO jwtDTO) throws SignatureException {
+
+        String oldRefreshToken = jwtDTO.jwtRefreshToken();
+
+        if (!tokenRepository.existsByToken(oldRefreshToken)) {
+            return jwtUtil.reissueToken(oldRefreshToken);
+        } else {
+            throw new CustomException(AuthErrorCode.BAD_REQUEST_400);
+        }
+    }
+
+    public JwtDTO login(MemberReqDTO.LoginRequestDTO loginRequestDTO) {
+
+        String email = loginRequestDTO.email();
+
+        CustomUserDetails userDetails = (CustomUserDetails)userDetailsService.loadUserByUsername(email);
+
+        return new JwtDTO(jwtUtil.createJwtAccessToken(userDetails),
+                jwtUtil.createJwtRefreshToken(userDetails));
+    }
+
+
     //로그아웃
-    public void logout(@AuthenticationPrincipal CustomUserDetails userDetails) {
-
-        String email = userDetails.getUsername();
-
-        Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
+    public void logout(String email) {
 
         int deletedCount = tokenRepository.deleteByEmail(email);
 
@@ -64,10 +87,7 @@ public class MemberCommandService {
     }
 
     //닉네임 변경
-    public void updateNickname(@AuthenticationPrincipal CustomUserDetails userDetails,
-                               MemberReqDTO.UpdateNicknameDTO updateNicknameDTO) {
-
-        String email = userDetails.getUsername();
+    public void updateNickname(String email, MemberReqDTO.UpdateNicknameDTO updateNicknameDTO) {
 
         String newNickname = updateNicknameDTO.newNickname();
 
@@ -82,10 +102,8 @@ public class MemberCommandService {
     }
 
     //패스워드 변경
-    public void updatePassword(@AuthenticationPrincipal CustomUserDetails userDetails,
+    public void updatePassword(String email,
                                MemberReqDTO.UpdatePasswordDTO updatePasswordDTO) {
-
-        String email = userDetails.getUsername();
 
         String newPassword = updatePasswordDTO.newPassword();
 
@@ -97,83 +115,5 @@ public class MemberCommandService {
         }
 
         memberRepository.updatePasswordByEmail(email, newPassword);
-    }
-
-    //인증 코드 변경
-    /*public void updateCode(MemberReqDTO.MailRequestDTO mailRequestDTO,
-                           String code) {
-
-        String email = mailRequestDTO.email();
-
-        Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
-
-        if (member.getVerificationCode().equals(code)) {
-            throw new CustomException(SAME_VALUE);
-        }
-
-        memberRepository.updateCodeByEmail(email, code);
-    }*/
-
-    //Jwt 생성
-    public JwtDTO createJwt(Member member) {
-
-        CustomUserDetailsService customUserDetailsService =
-                new CustomUserDetailsService(memberRepository);
-
-        CustomUserDetails newUserDetails =
-                (CustomUserDetails)customUserDetailsService.loadUserByUsername(member.getEmail());
-
-        //access 토큰 발급
-        String accessToken = jwtUtil.createJwtAccessToken(newUserDetails);
-
-        //refresh 토큰 발급
-        String refreshToken = jwtUtil.createJwtRefreshToken(newUserDetails);
-        //리프레시 토큰을 저장하기 위해 token 엔티티를 만든 뒤, refresh 토큰을 담아 저장
-        Token token = Token.builder()
-                .email(member.getEmail())
-                .token(refreshToken)
-                .build();
-
-        //멤버와의 연관관계
-        token.setMember(member);
-
-        tokenRepository.save(token);
-
-        return new JwtDTO(
-                accessToken,
-                refreshToken
-        );
-    }
-
-    public JwtDTO reissueToken(JwtDTO jwtDto) throws SignatureException {
-
-        log.info("[ Auth Service ] 토큰 재발급을 시작합니다.");
-        //토큰 파싱
-        String accessToken = jwtDto.jwtAccessToken();
-        String refreshToken = jwtDto.jwtRefreshToken();
-
-        //Access Token 으로부터 사용자 Email 추출
-        String email = jwtUtil.getEmail(refreshToken); // **수정부분**
-        log.info("[ Auth Service ] Email ---> {}", email);
-
-        //Access Token 에서의 Email 로 부터 DB 에 저장된 Refresh Token 가져오기
-        Token refreshTokenByDB = tokenRepository.findByEmail(email).orElseThrow(
-                () -> new AuthException(AuthErrorCode.UNAUTHORIZED_401)
-        );
-
-        //Refresh Token 이 유효한지 검사
-        jwtUtil.validateToken(refreshToken);
-
-        log.info("[ Auth Service ] Refresh Token 이 유효합니다.");
-
-        //만약 DB 에서 찾은 Refresh Token 과 파라미터로 온 Refresh Token 이 일치한다면 새로운 토큰 발급
-        if (refreshTokenByDB.getToken().equals(refreshToken)) {
-            log.info("[ Auth Service ] 토큰을 재발급합니다.");
-            return jwtUtil.reissueToken(refreshToken);
-        } else {
-            throw new AuthException(AuthErrorCode.UNAUTHORIZED_401);
-        }
-
     }
 }

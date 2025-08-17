@@ -16,13 +16,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final MemberRepository userRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         log.info("[ CustomUserDetailService ] Email을 이용하여 User를 검색합니다.");
 
-        Optional<Member> userEntity = userRepository.findByEmail(email);
+        Optional<Member> userEntity = memberRepository.findByEmail(email);
 
         if (userEntity.isPresent()) {
             Member member = userEntity.get();
