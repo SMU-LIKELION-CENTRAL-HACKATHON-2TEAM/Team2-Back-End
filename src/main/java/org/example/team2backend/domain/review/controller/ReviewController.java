@@ -1,5 +1,8 @@
 package org.example.team2backend.domain.review.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.team2backend.domain.review.dto.response.ReviewResponseDTO;
 import org.example.team2backend.domain.review.service.command.ReviewCommandService;
@@ -13,60 +16,60 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/reviews")
+@Tag(name = "리뷰 API", description = "리뷰 관련 API by 백종우")
 public class ReviewController {
     private final ReviewCommandService reviewCommandService;
     private final ReviewQueryService reviewQueryService;
 
+    @Operation(summary = "리뷰 작성", description = "특정 루트에 리뷰를 작성합니다.")
     @PostMapping(value = "/{routeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public CustomResponse<ReviewResponseDTO.ReviewCreateResDTO> createReview(
-            @RequestPart("content") String content,
-            @RequestPart(value = "images", required = false) List<MultipartFile> images,
-            @PathVariable Long routeId,
+            @Parameter(description = "리뷰 내용") @RequestPart("content") String content,
+            @Parameter(description = "리뷰 이미지 (선택)") @RequestPart(value = "images", required = false) List<MultipartFile> images,
+            @Parameter(description = "루트 ID") @PathVariable Long routeId,
             @AuthenticationPrincipal UserDetails userDetails){
         return CustomResponse.onSuccess(reviewCommandService.createReview(content, images, userDetails.getUsername(), routeId));
     }
 
+    @Operation(summary = "리뷰 조회", description = "특정 루트의 리뷰 목록을 커서 기반 페이지네이션으로 조회합니다.")
     @GetMapping("/{routeId}")
     public CustomResponse<ReviewResponseDTO.CursorResDTO<ReviewResponseDTO.ReviewResDTO>> getReviews(
-            @PathVariable Long routeId,
-            @RequestParam(required = false) Long cursor,
-            @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "루트 ID") @PathVariable Long routeId,
+            @Parameter(description = "커서 (null 또는 0이면 첫 페이지)") @RequestParam(required = false) Long cursor,
+            @Parameter(description = "페이지 크기") @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal UserDetails userDetails) {
         return CustomResponse.onSuccess(reviewQueryService.getReviews(routeId, cursor, size, userDetails.getUsername()));
     }
 
+    @Operation(summary = "리뷰 좋아요 토글", description = "리뷰에 좋아요/좋아요 취소를 합니다.")
     @PostMapping("/likes/{reviewId}")
-    public CustomResponse<String> likeReview(@PathVariable Long reviewId,
-                                             @AuthenticationPrincipal UserDetails userDetails) {
+    public CustomResponse<String> likeReview(
+            @Parameter(description = "리뷰 ID") @PathVariable Long reviewId,
+            @AuthenticationPrincipal UserDetails userDetails) {
         reviewCommandService.toggleLike(reviewId, userDetails.getUsername());
         return CustomResponse.onSuccess("리뷰 좋아요/취소가 완료됐습니다.");
     }
 
-//    @GetMapping("/me")
-//    public CustomResponse<ReviewResponseDTO.CursorResDTO<ReviewResponseDTO.MyReviewResDTO>> getMyReviews(
-//            @RequestParam(required = false) Long cursor,
-//            @RequestParam(defaultValue = "10") int size,
-//            @AuthenticationPrincipal UserDetails userDetails
-//    ){
-//        return CustomResponse.onSuccess(reviewQueryService.getMyReviews(userDetails.getUsername(), cursor, size));
-//    }
-
+    @Operation(summary = "리뷰 수정", description = "본인이 작성한 리뷰를 수정합니다.")
     @PatchMapping(value = "/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public CustomResponse<String> updateReview(
-            @RequestPart(value = "content", required = false) String content,
-            @RequestPart(value = "images", required = false) List<MultipartFile> images,
-            @PathVariable Long reviewId,
+            @Parameter(description = "리뷰 내용") @RequestPart(value = "content") String content,
+            @Parameter(description = "리뷰 이미지 (선택)") @RequestPart(value = "images", required = false) List<MultipartFile> images,
+            @Parameter(description = "리뷰 ID") @PathVariable Long reviewId,
             @AuthenticationPrincipal UserDetails userDetails){
         reviewCommandService.updateReview(reviewId, userDetails.getUsername(), content, images);
         return CustomResponse.onSuccess("리뷰 수정이 완료됐습니다.");
     }
 
+    @Operation(summary = "리뷰 삭제", description = "본인이 작성한 리뷰를 삭제합니다.")
     @DeleteMapping("/{reviewId}")
-    public CustomResponse<String> deleteReview(@PathVariable Long reviewId,
-                                               @AuthenticationPrincipal UserDetails userDetails){
+    public CustomResponse<String> deleteReview(
+            @Parameter(description = "리뷰 ID") @PathVariable Long reviewId,
+            @AuthenticationPrincipal UserDetails userDetails){
         reviewCommandService.deleteReview(reviewId, userDetails.getUsername());
         return CustomResponse.onSuccess("리뷰 삭제가 완료됐습니다.");
     }
