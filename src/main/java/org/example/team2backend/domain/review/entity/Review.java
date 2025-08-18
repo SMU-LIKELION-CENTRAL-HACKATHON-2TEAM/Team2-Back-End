@@ -30,4 +30,12 @@ public class Review extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "route_id")
     private Route route;
+
+    public void updateReview(String content) {
+        this.content = content;
+    }
+
+    public void linkMember(Member member) {this.member = member;}
+
+    public void linkRoute(Route route) {this.route = route;}
 }
