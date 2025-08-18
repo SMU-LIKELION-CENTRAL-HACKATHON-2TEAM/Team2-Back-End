@@ -54,6 +54,15 @@ public class ReviewController {
         return CustomResponse.onSuccess("리뷰 좋아요/취소가 완료됐습니다.");
     }
 
+    // @GetMapping("/me")
+    // public CustomResponse<ReviewResponseDTO.CursorResDTO<ReviewResponseDTO.MyReviewResDTO>> getMyReviews(
+            // @RequestParam(required = false) Long cursor,
+            // @RequestParam(defaultValue = "10") int size,
+            // @AuthenticationPrincipal UserDetails userDetails
+    // ){
+         // return CustomResponse.onSuccess(reviewQueryService.getMyReviews(userDetails.getUsername(), cursor, size));
+    // }
+
     @Operation(summary = "리뷰 수정", description = "본인이 작성한 리뷰를 수정합니다.")
     @PatchMapping(value = "/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public CustomResponse<String> updateReview(
