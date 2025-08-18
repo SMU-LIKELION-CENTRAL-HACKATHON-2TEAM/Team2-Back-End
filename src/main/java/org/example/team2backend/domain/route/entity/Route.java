@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.example.team2backend.domain.user.entity.User;
+import org.example.team2backend.domain.member.entity.Member;
 import org.example.team2backend.global.entity.BaseEntity;
 
 @Entity
@@ -34,5 +34,5 @@ public class Route extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private Member member;
 }
