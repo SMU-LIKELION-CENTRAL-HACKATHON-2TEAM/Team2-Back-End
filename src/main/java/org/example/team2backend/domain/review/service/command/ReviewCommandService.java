@@ -13,8 +13,12 @@ import org.example.team2backend.domain.review.entity.ReviewLike;
 import org.example.team2backend.domain.review.repository.ReviewImageRepository;
 import org.example.team2backend.domain.review.repository.ReviewLikeRepository;
 import org.example.team2backend.domain.review.repository.ReviewRepository;
+import org.example.team2backend.domain.route.entity.Route;
+import org.example.team2backend.domain.route.repository.RouteRepository;
 import org.example.team2backend.global.apiPayload.code.ReviewErrorCode;
+import org.example.team2backend.global.apiPayload.code.RouteErrorCode;
 import org.example.team2backend.global.apiPayload.exception.ReviewException;
+import org.example.team2backend.global.apiPayload.exception.RouteException;
 import org.example.team2backend.global.s3.service.S3Service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,12 +36,15 @@ public class ReviewCommandService {
     private final S3Service s3Service;
     private final MemberRepository memberRepository;
     private final ReviewLikeRepository reviewLikeRepository;
+    private final RouteRepository routeRepository;
 
-    public ReviewResponseDTO.ReviewCreateResDTO createReview(String content, List<MultipartFile> images, String email) {
+    public ReviewResponseDTO.ReviewCreateResDTO createReview(String content, List<MultipartFile> images, String email, Long routeId) {
 
         // 1. 리뷰 저장
         Review review = ReviewConverter.toReview(content);
+        Route route = routeRepository.findById(routeId).orElseThrow(()-> new RouteException(RouteErrorCode.ROUTE_NOT_FOUND));
         review.linkMember(getMember(email));
+        review.linkRoute(route);
         reviewRepository.save(review);
 
         // 2. 이미지 업로드 및 ReviewImage 저장

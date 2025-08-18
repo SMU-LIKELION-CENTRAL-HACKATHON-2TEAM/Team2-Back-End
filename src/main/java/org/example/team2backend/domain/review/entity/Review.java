@@ -36,4 +36,6 @@ public class Review extends BaseEntity {
     }
 
     public void linkMember(Member member) {this.member = member;}
+
+    public void linkRoute(Route route) {this.route = route;}
 }
