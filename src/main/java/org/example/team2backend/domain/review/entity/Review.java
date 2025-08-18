@@ -34,4 +34,6 @@ public class Review extends BaseEntity {
     public void updateReview(String content) {
         this.content = content;
     }
+
+    public void linkMember(Member member) {this.member = member;}
 }

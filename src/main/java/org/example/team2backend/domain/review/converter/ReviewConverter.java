@@ -1,10 +1,10 @@
 package org.example.team2backend.domain.review.converter;
 
+import org.example.team2backend.domain.member.entity.Member;
 import org.example.team2backend.domain.review.dto.response.ReviewResponseDTO;
 import org.example.team2backend.domain.review.entity.Review;
 import org.example.team2backend.domain.review.entity.ReviewImage;
 import org.example.team2backend.domain.review.entity.ReviewLike;
-import org.example.team2backend.domain.user.entity.User;
 import org.springframework.data.domain.Slice;
 
 import java.util.List;
@@ -43,16 +43,16 @@ public class ReviewConverter {
                         .toList())
                 .createdAt(review.getCreatedAt())
                 .author(ReviewResponseDTO.AuthorDTO.builder()
-                        .userId(review.getUser().getId())
-                        .nickname(review.getUser().getNickname())
+                        .memberId(review.getMember().getId())
+                        .nickname(review.getMember().getNickname())
                         .build())
                 .build();
     }
 
-    public static ReviewLike toReviewLike(Review review, User user) {
+    public static ReviewLike toReviewLike(Review review, Member member) {
         return ReviewLike.builder()
                 .review(review)
-                .user(user)
+                .member(member)
                 .build();
     }
 

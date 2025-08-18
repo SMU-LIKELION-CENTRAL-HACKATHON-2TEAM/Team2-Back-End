@@ -6,6 +6,8 @@ import org.example.team2backend.domain.review.service.command.ReviewCommandServi
 import org.example.team2backend.domain.review.service.query.ReviewQueryService;
 import org.example.team2backend.global.apiPayload.CustomResponse;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,8 +23,9 @@ public class ReviewController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public CustomResponse<ReviewResponseDTO.ReviewCreateResDTO> createReview(
             @RequestPart("content") String content,
-            @RequestPart(value = "images", required = false) List<MultipartFile> images){
-        return CustomResponse.onSuccess(reviewCommandService.createReview(content, images));
+            @RequestPart(value = "images", required = false) List<MultipartFile> images,
+            @AuthenticationPrincipal UserDetails userDetails){
+        return CustomResponse.onSuccess(reviewCommandService.createReview(content, images, userDetails.getUsername()));
     }
 
     @GetMapping("/{routeId}")
@@ -34,33 +37,35 @@ public class ReviewController {
     }
 
     @PostMapping("/{reviewId}")
-    public CustomResponse<String> likeReview(@PathVariable Long reviewId){
-        // TODO : 인가 완료되면 실제 user정보 넣기
-        reviewCommandService.toggleLike(reviewId, 1L);
+    public CustomResponse<String> likeReview(@PathVariable Long reviewId,
+                                             @AuthenticationPrincipal UserDetails userDetails) {
+        reviewCommandService.toggleLike(reviewId, userDetails.getUsername());
         return CustomResponse.onSuccess("리뷰 좋아요/취소가 완료됐습니다.");
     }
 
     @GetMapping("/me")
     public CustomResponse<ReviewResponseDTO.CursorResDTO<ReviewResponseDTO.MyReviewResDTO>> getMyReviews(
             @RequestParam(required = false) Long cursor,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal UserDetails userDetails
     ){
-        // TODO : 인가 완료되면 실제 user정보 넣기
-        return CustomResponse.onSuccess(reviewQueryService.getMyReviews(1L, cursor, size));
+        return CustomResponse.onSuccess(reviewQueryService.getMyReviews(userDetails.getUsername(), cursor, size));
     }
 
     @PatchMapping(value = "/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public CustomResponse<String> updateReview(
             @RequestPart(value = "content", required = false) String content,
             @RequestPart(value = "images", required = false) List<MultipartFile> images,
-            @PathVariable Long reviewId){
-        reviewCommandService.updateReview(reviewId, 1L, content, images);
+            @PathVariable Long reviewId,
+            @AuthenticationPrincipal UserDetails userDetails){
+        reviewCommandService.updateReview(reviewId, userDetails.getUsername(), content, images);
         return CustomResponse.onSuccess("리뷰 수정이 완료됐습니다.");
     }
 
     @DeleteMapping("/{reviewId}")
-    public CustomResponse<String> deleteReview(@PathVariable Long reviewId){
-        reviewCommandService.deleteReview(reviewId, 1L);
+    public CustomResponse<String> deleteReview(@PathVariable Long reviewId,
+                                               @AuthenticationPrincipal UserDetails userDetails){
+        reviewCommandService.deleteReview(reviewId, userDetails.getUsername());
         return CustomResponse.onSuccess("리뷰 삭제가 완료됐습니다.");
     }
 }

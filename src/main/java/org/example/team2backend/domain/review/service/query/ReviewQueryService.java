@@ -1,6 +1,10 @@
 package org.example.team2backend.domain.review.service.query;
 
 import lombok.RequiredArgsConstructor;
+import org.example.team2backend.domain.member.entity.Member;
+import org.example.team2backend.domain.member.exception.MemberErrorCode;
+import org.example.team2backend.domain.member.exception.MemberException;
+import org.example.team2backend.domain.member.repository.MemberRepository;
 import org.example.team2backend.domain.review.converter.ReviewConverter;
 import org.example.team2backend.domain.review.dto.response.ReviewResponseDTO;
 import org.example.team2backend.domain.review.entity.Review;
@@ -9,8 +13,6 @@ import org.example.team2backend.domain.review.repository.ReviewImageRepository;
 import org.example.team2backend.domain.review.repository.ReviewRepository;
 import org.example.team2backend.domain.route.entity.Route;
 import org.example.team2backend.domain.route.repository.RouteRepository;
-import org.example.team2backend.domain.user.entity.User;
-import org.example.team2backend.domain.user.repository.UserRepository;
 import org.example.team2backend.global.apiPayload.code.RouteErrorCode;
 import org.example.team2backend.global.apiPayload.exception.RouteException;
 import org.springframework.data.domain.PageRequest;
@@ -30,7 +32,7 @@ public class ReviewQueryService {
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final RouteRepository routeRepository;
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
 
     public ReviewResponseDTO.CursorResDTO<ReviewResponseDTO.ReviewResDTO> getReviews(Long routeId, Long cursor, int size) {
         Route route = routeRepository.findById(routeId)
@@ -52,16 +54,15 @@ public class ReviewQueryService {
         return ReviewConverter.toReviewSliceResponse(slice, imageMap);
     }
 
-    public ReviewResponseDTO.CursorResDTO<ReviewResponseDTO.MyReviewResDTO> getMyReviews(Long userId, Long cursor, int size) {
-        // TODO : User 부분 완성 시 구현
-        User user = userRepository.findById(userId).get();
-//                .orElseThrow(() -> new UserE(UserErrorCode.USER_NOT_FOUND));
+    public ReviewResponseDTO.CursorResDTO<ReviewResponseDTO.MyReviewResDTO> getMyReviews(String email, Long cursor, int size) {
+
+        Member member = getMember(email);
 
         Pageable pageable = PageRequest.of(0, size);
         Long effectiveCursorId = getEffectiveCursorId(cursor);
 
         Slice<Review> slice = reviewRepository
-                .findByUserAndIdLessThanOrderByIdDesc(user, effectiveCursorId, pageable);
+                .findByMemberAndIdLessThanOrderByIdDesc(member, effectiveCursorId, pageable);
 
         Map<Long, List<ReviewImage>> imageMap = slice.getContent().stream()
                 .collect(Collectors.toMap(
@@ -74,5 +75,9 @@ public class ReviewQueryService {
 
     private Long getEffectiveCursorId(Long cursorId) {
         return (cursorId == null || cursorId == 0) ? Long.MAX_VALUE : cursorId;
+    }
+
+    private Member getMember(String email) {
+        return memberRepository.findByEmail(email).orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
 }

@@ -25,7 +25,7 @@ public class ReviewResponseDTO {
 
     @Builder
     public record AuthorDTO(
-            Long userId,
+            Long memberId,
             String nickname
     ) {}
 

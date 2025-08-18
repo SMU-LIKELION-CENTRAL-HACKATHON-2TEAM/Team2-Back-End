@@ -1,6 +1,10 @@
 package org.example.team2backend.domain.review.service.command;
 
 import lombok.RequiredArgsConstructor;
+import org.example.team2backend.domain.member.entity.Member;
+import org.example.team2backend.domain.member.exception.MemberErrorCode;
+import org.example.team2backend.domain.member.exception.MemberException;
+import org.example.team2backend.domain.member.repository.MemberRepository;
 import org.example.team2backend.domain.review.converter.ReviewConverter;
 import org.example.team2backend.domain.review.dto.response.ReviewResponseDTO;
 import org.example.team2backend.domain.review.entity.Review;
@@ -9,8 +13,6 @@ import org.example.team2backend.domain.review.entity.ReviewLike;
 import org.example.team2backend.domain.review.repository.ReviewImageRepository;
 import org.example.team2backend.domain.review.repository.ReviewLikeRepository;
 import org.example.team2backend.domain.review.repository.ReviewRepository;
-import org.example.team2backend.domain.user.entity.User;
-import org.example.team2backend.domain.user.repository.UserRepository;
 import org.example.team2backend.global.apiPayload.code.ReviewErrorCode;
 import org.example.team2backend.global.apiPayload.exception.ReviewException;
 import org.example.team2backend.global.s3.service.S3Service;
@@ -28,13 +30,14 @@ public class ReviewCommandService {
     private final ReviewRepository reviewRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final S3Service s3Service;
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
     private final ReviewLikeRepository reviewLikeRepository;
 
-    public ReviewResponseDTO.ReviewCreateResDTO createReview(String content, List<MultipartFile> images) {
+    public ReviewResponseDTO.ReviewCreateResDTO createReview(String content, List<MultipartFile> images, String email) {
 
         // 1. 리뷰 저장
         Review review = ReviewConverter.toReview(content);
+        review.linkMember(getMember(email));
         reviewRepository.save(review);
 
         // 2. 이미지 업로드 및 ReviewImage 저장
@@ -46,38 +49,36 @@ public class ReviewCommandService {
         return ReviewConverter.toReviewCreateResDTO(review);
     }
 
-    public void toggleLike(Long reviewId, Long userId) {
+    public void toggleLike(Long reviewId, String email) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ReviewException(ReviewErrorCode.REVIEW_NOT_FOUND));
 
-        User user = userRepository.findById(userId).get();
-        // TODO : 유저 관련 구현 시 주석 풀기
-//                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+        Member member = getMember(email);
 
-        Optional<ReviewLike> existingLike = reviewLikeRepository.findByReviewAndUser(review, user);
+        Optional<ReviewLike> existingLike = reviewLikeRepository.findByReviewAndMember(review, member);
 
         if (existingLike.isPresent()) {
             // 이미 좋아요 → 취소
             reviewLikeRepository.delete(existingLike.get());
         } else {
             // 좋아요 추가
-            ReviewLike reviewLike = ReviewConverter.toReviewLike(review, user);
+            ReviewLike reviewLike = ReviewConverter.toReviewLike(review, member);
             reviewLikeRepository.save(reviewLike);
         }
     }
 
-    public void updateReview(Long reviewId, Long userId, String content, List<MultipartFile> images) {
+    public void updateReview(Long reviewId, String email, String content, List<MultipartFile> images) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ReviewException(ReviewErrorCode.REVIEW_NOT_FOUND));
 
-        validateReviewUser(review, userId);
+        validateReviewMember(review, getMember(email).getId());
 
         // 내용 수정
         review.updateReview(content);
 
         // 기존 이미지 삭제 + S3에서 제거
         List<ReviewImage> existingImages = reviewImageRepository.findByReview(review);
-        existingImages.stream().forEach(img -> {
+        existingImages.forEach(img -> {
             s3Service.deleteFile(img.getImageKey());
             reviewImageRepository.delete(img);
         });
@@ -90,12 +91,12 @@ public class ReviewCommandService {
     }
 
 
-    public void deleteReview(Long reviewId, Long userId) {
+    public void deleteReview(Long reviewId, String email) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ReviewException(ReviewErrorCode.REVIEW_NOT_FOUND));
 
         // 작성자 본인 확인
-        validateReviewUser(review, userId);
+        validateReviewMember(review, getMember(email).getId());
 
         // 이미지 삭제
         List<ReviewImage> images = reviewImageRepository.findByReview(review);
@@ -124,10 +125,15 @@ public class ReviewCommandService {
         }
     }
 
-    private void validateReviewUser(Review review, Long userId) {
-        if (!review.getUser().getId().equals(userId)){
+    private void validateReviewMember(Review review, Long memberId) {
+        if (!review.getMember().getId().equals(memberId)){
             throw new ReviewException(ReviewErrorCode.REVIEW_ACCESS_DENIED);
         }
     }
+
+    private Member getMember(String email){
+        return memberRepository.findByEmail(email).orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+    }
+
 
 }
