@@ -16,4 +16,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     Slice<Review> findByRouteAndIdLessThanOrderByIdDesc(Route route, Long id, Pageable pageable);
     Slice<Review> findByMemberAndIdLessThanOrderByIdDesc(Member member, Long id, Pageable pageable);
+
+    List<Review> findByRouteAndMemberIdOrderByIdDesc(Route route, Long memberId);
+
+    Slice<Review> findByRouteAndMemberIdNotAndIdLessThanOrderByIdDesc(
+            Route route, Long memberId, Long cursorId, Pageable pageable);
 }

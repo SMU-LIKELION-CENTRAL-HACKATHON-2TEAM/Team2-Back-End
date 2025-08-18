@@ -20,37 +20,39 @@ public class ReviewController {
     private final ReviewCommandService reviewCommandService;
     private final ReviewQueryService reviewQueryService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/{routeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public CustomResponse<ReviewResponseDTO.ReviewCreateResDTO> createReview(
             @RequestPart("content") String content,
             @RequestPart(value = "images", required = false) List<MultipartFile> images,
+            @PathVariable Long routeId,
             @AuthenticationPrincipal UserDetails userDetails){
-        return CustomResponse.onSuccess(reviewCommandService.createReview(content, images, userDetails.getUsername()));
+        return CustomResponse.onSuccess(reviewCommandService.createReview(content, images, userDetails.getUsername(), routeId));
     }
 
     @GetMapping("/{routeId}")
     public CustomResponse<ReviewResponseDTO.CursorResDTO<ReviewResponseDTO.ReviewResDTO>> getReviews(
             @PathVariable Long routeId,
             @RequestParam(required = false) Long cursor,
-            @RequestParam(defaultValue = "10") int size){
-        return CustomResponse.onSuccess(reviewQueryService.getReviews(routeId, cursor, size));
+            @RequestParam(defaultValue = "10") int size,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return CustomResponse.onSuccess(reviewQueryService.getReviews(routeId, cursor, size, userDetails.getUsername()));
     }
 
-    @PostMapping("/{reviewId}")
+    @PostMapping("/likes/{reviewId}")
     public CustomResponse<String> likeReview(@PathVariable Long reviewId,
                                              @AuthenticationPrincipal UserDetails userDetails) {
         reviewCommandService.toggleLike(reviewId, userDetails.getUsername());
         return CustomResponse.onSuccess("리뷰 좋아요/취소가 완료됐습니다.");
     }
 
-    @GetMapping("/me")
-    public CustomResponse<ReviewResponseDTO.CursorResDTO<ReviewResponseDTO.MyReviewResDTO>> getMyReviews(
-            @RequestParam(required = false) Long cursor,
-            @RequestParam(defaultValue = "10") int size,
-            @AuthenticationPrincipal UserDetails userDetails
-    ){
-        return CustomResponse.onSuccess(reviewQueryService.getMyReviews(userDetails.getUsername(), cursor, size));
-    }
+//    @GetMapping("/me")
+//    public CustomResponse<ReviewResponseDTO.CursorResDTO<ReviewResponseDTO.MyReviewResDTO>> getMyReviews(
+//            @RequestParam(required = false) Long cursor,
+//            @RequestParam(defaultValue = "10") int size,
+//            @AuthenticationPrincipal UserDetails userDetails
+//    ){
+//        return CustomResponse.onSuccess(reviewQueryService.getMyReviews(userDetails.getUsername(), cursor, size));
+//    }
 
     @PatchMapping(value = "/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public CustomResponse<String> updateReview(

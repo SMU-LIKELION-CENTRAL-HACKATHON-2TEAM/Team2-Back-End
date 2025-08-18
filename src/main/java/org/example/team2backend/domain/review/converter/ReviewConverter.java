@@ -34,7 +34,7 @@ public class ReviewConverter {
                 .build();
     }
 
-    public static ReviewResponseDTO.ReviewResDTO toReviewResDTO(Review review, List<ReviewImage> reviewImages) {
+    public static ReviewResponseDTO.ReviewResDTO toReviewResDTO(Review review, List<ReviewImage> reviewImages, Long currentMemberId, Long likeCount) {
         return ReviewResponseDTO.ReviewResDTO.builder()
                 .reviewId(review.getId())
                 .content(review.getContent())
@@ -46,6 +46,8 @@ public class ReviewConverter {
                         .memberId(review.getMember().getId())
                         .nickname(review.getMember().getNickname())
                         .build())
+                .isMine(currentMemberId != null && currentMemberId.equals(review.getMember().getId()))
+                .likeCount(likeCount)
                 .build();
     }
 
@@ -70,10 +72,12 @@ public class ReviewConverter {
 
     public static ReviewResponseDTO.CursorResDTO<ReviewResponseDTO.ReviewResDTO> toReviewSliceResponse(
             Slice<Review> slice,
-            Map<Long, List<ReviewImage>> imageMap
+            Map<Long, List<ReviewImage>> imageMap,
+            Map<Long, Long> likeCountMap,
+            Long currentMemberId
     ) {
         List<ReviewResponseDTO.ReviewResDTO> dtos = slice.getContent().stream()
-                .map(review -> toReviewResDTO(review, imageMap.getOrDefault(review.getId(), List.of())))
+                .map(review -> toReviewResDTO(review, imageMap.getOrDefault(review.getId(), List.of()), currentMemberId, likeCountMap.getOrDefault(review.getId(), 0L)))
                 .toList();
 
         Long nextCursor = slice.hasNext()

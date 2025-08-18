@@ -20,6 +20,8 @@ public class ReviewResponseDTO {
             String content,
             List<String> images,
             LocalDateTime createdAt,
+            Boolean isMine,
+            Long likeCount,
             AuthorDTO author
     ) {}
 
