@@ -20,6 +20,7 @@ public class PlaceConverter {
     //엔티티를 새로 만들지 않고, 변경이 들어간 값이 있는 필드만 수정
     //솔직히 비효율적인 것 같긴 한데, 이게 제가 생각할 수 있는 최선이었습니다...
     public static void updatePlace(Place place, PlaceReqDTO.UpdateReqDTO updateReqDTO) {
+        //모든 필드에 대해 dto의 내용과 같은 지 검사 후, 다르면 업데이틍
         if (!updateReqDTO.placeName().equals(place.getName()))
             place.setName(updateReqDTO.placeName());
         if (!updateReqDTO.category().equals(place.getCategory()))

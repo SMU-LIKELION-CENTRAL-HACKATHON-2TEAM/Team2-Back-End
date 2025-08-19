@@ -1,6 +1,5 @@
 package org.example.team2backend.domain.place.repository;
 
-import org.example.team2backend.domain.member.entity.Member;
 import org.example.team2backend.domain.place.entity.Place;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,5 +17,6 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
 
     @Query("SELECT p FROM Place p WHERE p.kakaoId = :kakaoId")
     Optional<Place> findByKakaoId(@Param("kakaoId") String kakaoId);
+
 
 }
