@@ -15,6 +15,7 @@ import org.example.team2backend.global.entity.BaseEntity;
 @NoArgsConstructor
 @Table(name = "route_place")
 public class RoutePlace extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

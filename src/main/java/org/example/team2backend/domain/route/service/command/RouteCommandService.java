@@ -69,6 +69,7 @@ public class RouteCommandService {
             }
             //두 루트가 같다면 예외 발생
             if (isSame) {
+                log.warn("[ RouteCommandService ] 두 루트가 동일합니다.");
                 throw new RouteException(RouteErrorCode.ROUTE_ALREADY_EXISTS);
             }
         }
@@ -76,11 +77,13 @@ public class RouteCommandService {
         //루트 만들고 저장
         Route route = toRoute(createRouteDTO);
         routeRepository.save(route);
+        log.info("[ RouteCommandService ] 루트 생성 후 저장.");
 
         for (int i = 0; i < newPlaces.size(); i++) {
             RouteReqDTO.PlaceDTO placeDTO = newPlaces.get(i);
 
             //카카오 아이디로 Place 조회 → 없으면 새로 저장
+            log.info("[ RouteCommandService ] kakaoId로 장소를 조회합니다.");
             Place place = placeRepository.findByKakaoId(placeDTO.kakaoId())
                     .orElseGet(() -> placeRepository.save(RouteConverter.toPlaceWithKakao(placeDTO)));
 
@@ -95,6 +98,6 @@ public class RouteCommandService {
             //매핑 테이블 저장
             routePlaceRepository.save(rp);
         }
-
+        log.info("[ RouteCommandService ] 매핑 테이블 저장 완료.");
     }
 }

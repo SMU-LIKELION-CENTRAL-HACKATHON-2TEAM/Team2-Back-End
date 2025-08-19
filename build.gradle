@@ -53,8 +53,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
     // Spring AI
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter:1.0.0-M2'
+    //implementation 'org.springframework.boot:spring-boot-starter-web'
+    //implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter:1.0.0-M2'
 
 }
 

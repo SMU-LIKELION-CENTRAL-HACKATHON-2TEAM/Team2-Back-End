@@ -15,4 +15,7 @@ public interface RoutePlaceRepository extends JpaRepository<RoutePlace, Long> {
     List<RoutePlace> findByVisitOrder(@Param("visitOrder") Long visitOrder);
 
     List<RoutePlace> findByRoute(Route route);
+
+    @Query("SELECT rp FROM RoutePlace rp JOIN FETCH rp.place WHERE rp.route.id = :routeId ORDER BY rp.visitOrder ASC")
+    List<RoutePlace> findAllByRouteId(@Param("routeId") Long routeId);
 }
