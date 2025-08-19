@@ -1,7 +1,5 @@
 package org.example.team2backend.domain.route.dto.response;
 
-import org.example.team2backend.domain.route.dto.request.RouteReqDTO;
-
 import java.util.List;
 
 public class RouteResDTO {

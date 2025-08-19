@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.team2backend.domain.place.entity.Place;
 import org.example.team2backend.domain.route.converter.RouteConverter;
 import org.example.team2backend.domain.route.dto.request.RouteReqDTO;
 import org.example.team2backend.domain.route.dto.response.RouteResDTO;
@@ -12,7 +11,6 @@ import org.example.team2backend.domain.route.service.command.RouteCommandService
 import org.example.team2backend.domain.route.service.query.RouteQueryService;
 import org.example.team2backend.domain.route.service.query.RouteRecommendationService;
 import org.example.team2backend.global.apiPayload.CustomResponse;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -51,7 +49,7 @@ public class RouteController {
                 .toList();
     }
 
-    //장소 추천
+    //루트 추천
     @Operation(summary = "루트 추천 api", description = "open ai api를 이용하여 거리를 기반으로, 다음 방문 루트를 추천합니다.")
     @GetMapping("/recommend")
     public CustomResponse<?> recommendPlaces(

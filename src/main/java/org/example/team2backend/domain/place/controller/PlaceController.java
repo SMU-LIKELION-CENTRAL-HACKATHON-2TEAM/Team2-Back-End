@@ -6,15 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.team2backend.domain.place.dto.request.PlaceReqDTO;
 import org.example.team2backend.domain.place.service.command.PlaceCommandService;
-import org.example.team2backend.domain.route.dto.request.RouteReqDTO;
-import org.example.team2backend.domain.route.dto.response.RouteResDTO;
-import org.example.team2backend.domain.route.service.query.RouteRecommendationService;
 import org.example.team2backend.global.apiPayload.CustomResponse;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.util.List;
 
 @Slf4j
 @RestController
