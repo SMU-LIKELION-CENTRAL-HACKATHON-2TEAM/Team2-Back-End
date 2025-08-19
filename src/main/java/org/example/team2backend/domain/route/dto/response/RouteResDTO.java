@@ -18,8 +18,10 @@ public class RouteResDTO {
             Boolean isActivate
     ) {}
 
-    public record GetRouteDTO(
-            String routeName,
-            List<RouteReqDTO.PlaceDTO> places
+    public record RouteDTO(
+            PlaceDTO startPlace,
+            List<PlaceDTO> nextPlaces,
+            String description
     ) {}
+
 }

@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PlaceRepository extends JpaRepository<Place, Long> {
@@ -17,6 +18,10 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
 
     @Query("SELECT p FROM Place p WHERE p.kakaoId = :kakaoId")
     Optional<Place> findByKakaoId(@Param("kakaoId") String kakaoId);
+
+    @Query("SELECT p FROM Place p " +
+            "WHERE function('ST_Distance_Sphere', point(p.lng, p.lat), point(:lng, :lat)) < 5000")
+    List<Place> findNearby(@Param("lat") Double lat, @Param("lng") Double lng);
 
 
 }

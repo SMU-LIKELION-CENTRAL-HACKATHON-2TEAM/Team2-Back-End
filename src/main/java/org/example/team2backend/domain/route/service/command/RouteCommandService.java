@@ -90,9 +90,9 @@ public class RouteCommandService {
             //매핑 테이블(RoutePlace) 생성
             //dto를 변환하는 것이 아니기 때문에 Converter는 사용하지 않았음.
             RoutePlace rp = RoutePlace.builder()
-                    .route(route)        // FK: route_id
-                    .place(place)        // FK: place_id
-                    .visitOrder(i + 1)   // 방문 순서
+                    .route(route)
+                    .place(place)
+                    .visitOrder(i + 1)
                     .build();
 
             //매핑 테이블 저장
