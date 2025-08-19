@@ -1,7 +1,5 @@
 package org.example.team2backend.domain.route.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
-
 import java.util.List;
 
 public class RouteReqDTO {

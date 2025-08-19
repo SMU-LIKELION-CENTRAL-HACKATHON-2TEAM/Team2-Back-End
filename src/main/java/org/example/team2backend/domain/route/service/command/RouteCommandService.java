@@ -3,7 +3,6 @@ package org.example.team2backend.domain.route.service.command;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.team2backend.domain.place.converter.PlaceConverter;
 import org.example.team2backend.domain.place.entity.Place;
 import org.example.team2backend.domain.place.repository.PlaceRepository;
 import org.example.team2backend.domain.route.converter.RouteConverter;
