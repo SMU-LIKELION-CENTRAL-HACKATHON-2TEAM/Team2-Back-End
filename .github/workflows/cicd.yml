@@ -47,20 +47,18 @@ jobs:
       - name: docker Hub push
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_IMAGENAME }}
 
-
-
       #------------------- EC2 --------------------
 
       - name: AWS EC2 Connection
-        uses: appleboy/ssh-action@v0.1.6
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
-          password: ${{ secrets.EC2_PASSWORD }}
-          port: ${{ secrets.EC2_SSH_PORT }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: 22
           timeout: 60s
           script: |
-            sudo docker stop ${{ secrets.DOCKERHUB_IMAGENAME }}
-            sudo docker rm ${{ secrets.DOCKERHUB_IMAGENAME }}
+            sudo docker stop ${{ secrets.DOCKERHUB_IMAGENAME }} || true
+            sudo docker rm ${{ secrets.DOCKERHUB_IMAGENAME }} || true
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_IMAGENAME }}
             sudo docker run -it -d -p 443:443 --name ${{ secrets.DOCKERHUB_IMAGENAME }} -e TZ=Asia/Seoul ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_IMAGENAME }}
