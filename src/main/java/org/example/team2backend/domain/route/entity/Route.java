@@ -38,4 +38,8 @@ public class Route extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private Member member;
+
+    public void linkMember(Member member){
+        this.member = member;
+    }
 }

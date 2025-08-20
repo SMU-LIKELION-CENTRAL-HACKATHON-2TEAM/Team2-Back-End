@@ -5,12 +5,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.team2backend.domain.member.entity.Member;
 import org.example.team2backend.domain.member.entity.MemberRoute;
+import org.example.team2backend.domain.member.exception.MemberErrorCode;
+import org.example.team2backend.domain.member.exception.MemberException;
 import org.example.team2backend.domain.member.repository.MemberRepository;
 import org.example.team2backend.domain.member.repository.MemberRouteRepository;
 import org.example.team2backend.domain.place.entity.Place;
 import org.example.team2backend.domain.route.dto.response.RouteResDTO;
 import org.example.team2backend.domain.route.entity.RoutePlace;
 import org.example.team2backend.domain.route.repository.RoutePlaceRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,18 +31,25 @@ public class MemberRouteQueryService {
     private final RoutePlaceRepository routePlaceRepository;
 
     //스크랩 루트 조회
-    public List<RouteResDTO.RouteDTO> getScrapList(String email) {
+    public RouteResDTO.CursorResDTO<RouteResDTO.RouteDTO> getScrapList(
+            String email, Long cursor, int size
+    ) {
         Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원"));
+                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-        // 1. 사용자가 외래키로 들어가있는 모든 매핑 테이블 조회 -> 리스트로 반환
-        List<MemberRoute> mrs = memberRouteRepository.findMemberRouteByMember(member);
+        Pageable pageable = PageRequest.of(0, size);
+        Long effectiveCursorId = (cursor == null || cursor <= 0)
+                ? Long.MAX_VALUE
+                : cursor;
 
-        // 2. 각 MemberRoute → RouteDTO 변환
-        return mrs.stream()
+        Slice<MemberRoute> scrapSlice =
+                memberRouteRepository.findByMemberAndIdLessThanOrderByIdDesc(
+                        member, effectiveCursorId, pageable
+                );
+
+        List<RouteResDTO.RouteDTO> routeDTOs = scrapSlice.getContent().stream()
                 .map(MemberRoute::getRoute)
                 .map(route -> {
-                    // 🔹 routePlaces를 직접 조회해야 함 (엔티티 필드 접근 불가)
                     List<RoutePlace> routePlaces = routePlaceRepository.findByRoute(route);
 
                     List<RouteResDTO.PlaceDTO> places = routePlaces.stream()
@@ -58,12 +70,20 @@ public class MemberRouteQueryService {
                             .toList();
 
                     return new RouteResDTO.RouteDTO(
+                            route.getId(),                       // routeId
+                            route.getName(),                     // name
                             places.isEmpty() ? null : places.get(0), // startPlace
-                            places.size() > 1 ? places.subList(1, places.size()) : List.of(),
-                            route.getSummary()
+                            places.size() > 1 ? places.subList(1, places.size()) : List.of(), // 나머지 장소들
+                            route.getSummary()                   // summary
                     );
+
                 })
                 .toList();
-    }
 
+        Long nextCursor = scrapSlice.hasNext()
+                ? scrapSlice.getContent().get(scrapSlice.getContent().size() - 1).getId()
+                : null;
+
+        return new RouteResDTO.CursorResDTO<>(routeDTOs, scrapSlice.hasNext(), nextCursor);
+    }
 }

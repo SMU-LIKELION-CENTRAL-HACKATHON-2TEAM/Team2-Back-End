@@ -17,9 +17,18 @@ public class RouteResDTO {
     ) {}
 
     public record RouteDTO(
+            Long routeId,
+            String name,
             PlaceDTO startPlace,
-            List<PlaceDTO> nextPlaces,
-            String description
+            List<PlaceDTO> places,
+            String summary
+    ) {}
+
+    // 📌 커서 기반 응답 DTO
+    public record CursorResDTO<T>(
+            List<T> content,
+            boolean hasNext,
+            Long nextCursor
     ) {}
 
 

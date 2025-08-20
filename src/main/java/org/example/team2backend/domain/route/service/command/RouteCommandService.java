@@ -3,6 +3,10 @@ package org.example.team2backend.domain.route.service.command;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.team2backend.domain.member.entity.Member;
+import org.example.team2backend.domain.member.exception.MemberErrorCode;
+import org.example.team2backend.domain.member.exception.MemberException;
+import org.example.team2backend.domain.member.repository.MemberRepository;
 import org.example.team2backend.domain.place.entity.Place;
 import org.example.team2backend.domain.place.repository.PlaceRepository;
 import org.example.team2backend.domain.route.converter.RouteConverter;
@@ -29,11 +33,14 @@ public class RouteCommandService {
     private final RouteRepository routeRepository;
     private final RoutePlaceRepository routePlaceRepository;
     private final PlaceRepository placeRepository;
+    private final MemberRepository memberRepository;
 
     //루트 생성
     //각 장소에 대한 정보를 하나씩 받음
-    public void createRoute(RouteReqDTO.CreateRouteDTO createRouteDTO) {
+    public void createRoute(RouteReqDTO.CreateRouteDTO createRouteDTO, String email) {
 
+        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+        
         //dto에서 리스트 형식으로 선택한 장소의 갯수 가져오기
         List<RouteReqDTO.PlaceDTO> newPlaces = createRouteDTO.places();
 
@@ -76,6 +83,7 @@ public class RouteCommandService {
 
         //루트 만들고 저장
         Route route = toRoute(createRouteDTO);
+        route.linkMember(member);
         routeRepository.save(route);
         log.info("[ RouteCommandService ] 루트 생성 후 저장.");
 
