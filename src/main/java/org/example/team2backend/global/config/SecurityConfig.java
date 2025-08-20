@@ -39,6 +39,7 @@ public class SecurityConfig {
             "/api/v1/members", //회원 가입
             "/api/v1/members/login", //로그인
             "/api/v1/emails", //이메일 인증
+            "/api/v1/emails/codes",
             "/swagger-ui/**", //스웨거 관련 기능
             "/v3/api-docs/**" //스웨거 관련 기능
     };
