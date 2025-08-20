@@ -19,13 +19,14 @@ public class RouteConverter {
                 .isActive(placeDTO.isActivate())
                 .description(placeDTO.description())
                 .build();
-
     }
 
     public static Route toRoute(RouteReqDTO.CreateRouteDTO createRouteDTO) {
         //나머지 필드들은 null or 0으로 초기화
         return Route.builder()
                 .name(createRouteDTO.routeName())
+                .saveCount(0L)
+                .visitCount(0L)
                 .build();
     }
 

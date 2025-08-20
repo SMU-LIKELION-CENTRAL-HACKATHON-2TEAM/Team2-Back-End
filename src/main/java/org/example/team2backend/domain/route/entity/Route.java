@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.example.team2backend.domain.member.entity.Member;
 import org.example.team2backend.global.entity.BaseEntity;
 
+
 @Entity
 @Getter
 @Builder
@@ -37,4 +38,8 @@ public class Route extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private Member member;
+
+    public void linkMember(Member member){
+        this.member = member;
+    }
 }

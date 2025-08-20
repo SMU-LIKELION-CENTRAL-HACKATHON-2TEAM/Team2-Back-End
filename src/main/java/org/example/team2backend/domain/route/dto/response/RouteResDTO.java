@@ -1,7 +1,5 @@
 package org.example.team2backend.domain.route.dto.response;
 
-import org.example.team2backend.domain.route.dto.request.RouteReqDTO;
-
 import java.util.List;
 
 public class RouteResDTO {
@@ -19,9 +17,20 @@ public class RouteResDTO {
     ) {}
 
     public record RouteDTO(
+            Long routeId,
+            String name,
             PlaceDTO startPlace,
-            List<PlaceDTO> nextPlaces,
-            String description
+            List<PlaceDTO> places,
+            String summary
     ) {}
+
+    // 📌 커서 기반 응답 DTO
+    public record CursorResDTO<T>(
+            List<T> content,
+            boolean hasNext,
+            Long nextCursor
+    ) {}
+
+
 
 }

@@ -15,12 +15,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Modifying
     @Query("UPDATE Member m SET m.nickname = :newNickname WHERE m.email = :email")
-    int updateNicknameByEmail(@Param("email") String email,
+    void updateNicknameByEmail(@Param("email") String email,
                             @Param("newNickname") String newNickname);
 
     @Modifying
     @Query("UPDATE Member m SET m.password = :newPassword WHERE m.email = :email")
-    int updatePasswordByEmail(@Param("email") String email,
+    void updatePasswordByEmail(@Param("email") String email,
                             @Param("newPassword") String newPassword);
 
 }

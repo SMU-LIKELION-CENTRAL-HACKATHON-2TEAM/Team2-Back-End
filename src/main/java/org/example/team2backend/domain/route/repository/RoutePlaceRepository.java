@@ -9,9 +9,11 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface RoutePlaceRepository extends JpaRepository<RoutePlace, Long> {
-    
+
     List<RoutePlace> findByRoute(Route route);
 
     @Query("SELECT rp FROM RoutePlace rp JOIN FETCH rp.place WHERE rp.route.id = :routeId ORDER BY rp.visitOrder ASC")
-    List<RoutePlace> findAllByRouteId(@Param("routeId") Long routeId);
+    List<RoutePlace> findAllByKakaoId(@Param("kakaoId") Long kakaoId);
+
+
 }

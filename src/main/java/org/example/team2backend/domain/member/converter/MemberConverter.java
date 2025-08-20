@@ -18,7 +18,6 @@ public class MemberConverter {
                 .build();
     }
 
-
     public static EmailVerification toEmailVerification(String email, String code){
         return EmailVerification.builder()
                 .email(email)
