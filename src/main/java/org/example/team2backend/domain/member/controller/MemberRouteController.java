@@ -32,7 +32,7 @@ public class MemberRouteController {
         return CustomResponse.onSuccess(memberQueryService.showMemberInfo(email));
     }
 
-    @Operation(summary = "사용자 스크랩 루트 추가", description = "스크랩 루트를 추가합니다.")
+    @Operation(summary = "루트 스크랩 토글", description = "루트에 스크랩을 취소합니다.")
     @PostMapping("/me")
     public CustomResponse<?> updateScrap(@AuthenticationPrincipal CustomUserDetails userDetails,
                                          MemberRouteReqDTO.ScrapRequestDTO scrapRequestDTO) {
@@ -41,24 +41,9 @@ public class MemberRouteController {
 
         Long routeId = scrapRequestDTO.routeId();
 
-        memberRouteCommandService.addScrap(email, routeId);
+        memberRouteCommandService.toggleScrap(email, routeId);
 
-
-        return CustomResponse.onSuccess("스크랩 추가 완료");
+        return CustomResponse.onSuccess("루트 스크랩 토글 완료");
     }
-
-    @Operation(summary = "사용자 스크랩 루트 삭제", description = "스크랩 루트를 삭제합니다.")
-    @DeleteMapping("/me")
-    public CustomResponse<?> deleteScrap(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                         MemberRouteReqDTO.ScrapRequestDTO scrapRequestDTO) {
-
-        String email = userDetails.getUsername();
-
-        Long routeId = scrapRequestDTO.routeId();
-
-
-        return CustomResponse.onSuccess("스크랩 추가 완료");
-    }
-
 }
 

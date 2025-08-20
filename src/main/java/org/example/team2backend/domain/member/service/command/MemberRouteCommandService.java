@@ -7,8 +7,6 @@ import org.example.team2backend.domain.member.entity.Member;
 import org.example.team2backend.domain.member.entity.MemberRoute;
 import org.example.team2backend.domain.member.exception.MemberErrorCode;
 import org.example.team2backend.domain.member.exception.MemberException;
-import org.example.team2backend.domain.member.exception.MemberRouteErrorCode;
-import org.example.team2backend.domain.member.exception.MemberRouteException;
 import org.example.team2backend.domain.member.repository.MemberRepository;
 import org.example.team2backend.domain.member.repository.MemberRouteRepository;
 import org.example.team2backend.domain.route.entity.Route;
@@ -17,6 +15,8 @@ import org.example.team2backend.domain.route.exception.RouteException;
 import org.example.team2backend.domain.route.repository.RouteRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -28,8 +28,8 @@ public class MemberRouteCommandService {
     private final RouteRepository routeRepository;
     private final MemberRouteRepository memberRouteRepository;
 
-    //스크랩 추가
-    public void addScrap(String email, Long routeId) {
+    //스크랩 추가 또는 삭제
+    public void toggleScrap(String email, Long routeId) {
 
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
@@ -37,36 +37,14 @@ public class MemberRouteCommandService {
         Route route = routeRepository.findById(routeId)
                 .orElseThrow(() -> new RouteException(RouteErrorCode.ROUTE_NOT_FOUND));
 
-        MemberRoute memberRoute = MemberRouteConverter.toMemberRoute(member, route);
+        Optional<MemberRoute> ExistMr = memberRouteRepository.findMemberRouteByMemberAndRoute(member, route);
 
-        //이미 스크랩 했는 지 여부
-        if (memberRouteRepository.findMemberRouteByMemberAndRoute(member, route).isEmpty()) {
-            memberRouteRepository.save(memberRoute);
+        //만약 테이블이 존재한다면
+        if (ExistMr.isPresent()) {
+            memberRouteRepository.delete(ExistMr.get());
         } else {
-            throw new IllegalArgumentException("이미 해당 회원이 동일한 루트로 등록했습니다.");
+            MemberRoute memberRoute = MemberRouteConverter.toMemberRoute(member, route);
+            memberRouteRepository.save(memberRoute);
         }
     }
-
-    //스크랩 삭제
-    public void deleteScrap(String email, Long routeId) {
-
-        Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
-
-        Route route = routeRepository.findById(routeId)
-                .orElseThrow(() -> new RouteException(RouteErrorCode.ROUTE_NOT_FOUND));
-
-        MemberRoute memberRoute = MemberRouteConverter.toMemberRoute(member, route);
-
-        if (memberRouteRepository.findMemberRouteByMemberAndRoute(member, route).isPresent()) {
-            memberRouteRepository.save(memberRoute);
-        } else {
-            throw new MemberRouteException(MemberRouteErrorCode.MEMBER_ROUTE_NOT_FOUND);
-        }
-
-
-
-    }
-
-
 }
