@@ -20,7 +20,7 @@ import java.security.SignatureException;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/members")
-@Tag(name = "Email Login", description = "일반 로그인 관련 API by 한민")
+@Tag(name = "Email Login API", description = "일반 로그인 관련 API by 한민")
 public class MemberController {
 
     private final MemberCommandService memberCommandService;

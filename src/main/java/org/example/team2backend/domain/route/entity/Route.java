@@ -16,6 +16,7 @@ import org.example.team2backend.global.entity.BaseEntity;
 @NoArgsConstructor
 @Table(name = "route")
 public class Route extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,6 +24,7 @@ public class Route extends BaseEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
+    //해당 루트에 대한 AI 요약
     @Column(name = "summary")
     private String summary;
 
