@@ -7,11 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.team2backend.domain.member.dto.request.MemberRouteReqDTO;
 import org.example.team2backend.domain.member.service.command.MemberRouteCommandService;
 import org.example.team2backend.domain.member.service.query.MemberQueryService;
+import org.example.team2backend.domain.member.service.query.MemberRouteQueryService;
 import org.example.team2backend.global.apiPayload.CustomResponse;
 import org.example.team2backend.global.security.auth.CustomUserDetails;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 
 @Slf4j
 @RestController
@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Scrap API", description = "루트 스크랩 관련 API by 한민")
 public class MemberRouteController {
 
-    private final MemberQueryService memberQueryService;
     private final MemberRouteCommandService memberRouteCommandService;
+    private final MemberRouteQueryService memberRouteQueryService;
 
     @Operation(summary = "사용자 스크랩 루트 전체 조회", description = "사용자가 스크랩한 루트 전체를 조회합니다.")
     @GetMapping("/me")
@@ -29,7 +29,7 @@ public class MemberRouteController {
 
         String email = userDetails.getUsername();
 
-        return CustomResponse.onSuccess(memberQueryService.showMemberInfo(email));
+        return CustomResponse.onSuccess(memberRouteQueryService.getScrapList(email));
     }
 
     @Operation(summary = "루트 스크랩 토글", description = "루트에 스크랩을 취소합니다.")
