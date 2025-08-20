@@ -19,7 +19,6 @@ public class RouteConverter {
                 .isActive(placeDTO.isActivate())
                 .description(placeDTO.description())
                 .build();
-
     }
 
     public static Route toRoute(RouteReqDTO.CreateRouteDTO createRouteDTO) {

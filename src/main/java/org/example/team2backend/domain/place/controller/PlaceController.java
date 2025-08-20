@@ -27,4 +27,5 @@ public class PlaceController {
 
         return CustomResponse.onSuccess("장소 등록(업데이트) 완료");
     }
+
 }

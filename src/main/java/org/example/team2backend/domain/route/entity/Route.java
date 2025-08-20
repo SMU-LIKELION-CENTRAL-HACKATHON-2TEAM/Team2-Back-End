@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.example.team2backend.domain.member.entity.Member;
 import org.example.team2backend.global.entity.BaseEntity;
 
+
 @Entity
 @Getter
 @Builder

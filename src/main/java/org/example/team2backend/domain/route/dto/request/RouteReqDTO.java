@@ -17,4 +17,8 @@ public class RouteReqDTO {
             String routeName,
             List<PlaceDTO> places
     ) {}
+
+    public record ScrapRouteDTO(
+            Long id
+    ) {}
 }
