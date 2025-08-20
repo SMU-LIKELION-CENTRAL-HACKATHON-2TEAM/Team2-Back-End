@@ -27,7 +27,7 @@ public class MemberReqDTO {
     ) {}
 
     public record VerifyRequestDTO(
-            String userCode, //입력된 코드
-            String verificationCode //발급된 코드
+            String email,
+            String code
     ) {}
 }
