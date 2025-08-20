@@ -14,7 +14,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class OpenAiService {
 
-    @Value("${openai.api-key}")
+    @Value("${spring.openai.api-key}")
     private String apiKey;
 
     private final OkHttpClient client = new OkHttpClient();
