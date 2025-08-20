@@ -5,8 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.team2backend.domain.member.dto.request.MemberReqDTO;
 import org.example.team2backend.domain.member.dto.response.MemberResDTO;
+import org.example.team2backend.domain.member.entity.EmailVerification;
 import org.example.team2backend.domain.member.entity.Member;
+import org.example.team2backend.domain.member.repository.EmailVerificationRepository;
 import org.example.team2backend.domain.member.repository.MemberRepository;
+import org.example.team2backend.global.apiPayload.code.GeneralErrorCode;
 import org.example.team2backend.global.apiPayload.exception.CustomException;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +23,7 @@ import static org.example.team2backend.domain.member.exception.MemberErrorCode.V
 public class MemberQueryService {
 
     private final MemberRepository memberRepository;
+    private final EmailVerificationRepository emailVerificationRepository;
 
     public MemberResDTO.MemberResponseDTO showMemberInfo(
             String email) {
@@ -33,12 +37,14 @@ public class MemberQueryService {
     //인증 코드 일치 여부 검사
     public void verifyCode(MemberReqDTO.VerifyRequestDTO verifyRequestDTO) {
 
-        String code = verifyRequestDTO.userCode();
+        EmailVerification emailVerification =
+                emailVerificationRepository.findByEmailAndCode(verifyRequestDTO.email(), verifyRequestDTO.code()).orElseThrow(() -> new CustomException(GeneralErrorCode.NOT_FOUND_404));
 
-        String verificationCode = verifyRequestDTO.verificationCode(); //사용자가 입력한 인증코드
-
-        if (!code.equals(verificationCode)) {
+        if (!emailVerification.getCode().equals(verifyRequestDTO.code())) {
             throw new CustomException(VERIFICATION_CODE_MISMATCH);
+        }
+        else{
+            emailVerification.verify();
         }
     }
 }

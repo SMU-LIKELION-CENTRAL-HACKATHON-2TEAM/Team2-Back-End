@@ -24,17 +24,17 @@ public class MailController {
 
     @Operation(summary = "인증 코드 발급 API", description = "인증 코드 발급 API 입니다.")
     @PostMapping("")
-    public CustomResponse<?> sendCode(@RequestBody MemberReqDTO.MailRequestDTO mailRequestDTO)
+    public CustomResponse<String> sendCode(@RequestBody MemberReqDTO.MailRequestDTO mailRequestDTO)
             throws MessagingException {
 
-        String code = mailCommandService.sendSimpleMessage(mailRequestDTO.email());
+        mailCommandService.sendSimpleMessage(mailRequestDTO.email());
 
-        return CustomResponse.onSuccess(code);
+        return CustomResponse.onSuccess("해당 이메일로 인증 코드를 발급했습니다.");
     }
 
     @Operation(summary = "인증 코드 검증 API", description = "인증 코드 검증 API 입니다.")
     @PostMapping("/codes")
-    public CustomResponse<?> verifyCode(@RequestBody MemberReqDTO.VerifyRequestDTO verifyRequestDTO) {
+    public CustomResponse<String> verifyCode(@RequestBody MemberReqDTO.VerifyRequestDTO verifyRequestDTO) {
 
         memberQueryService.verifyCode(verifyRequestDTO);
 
