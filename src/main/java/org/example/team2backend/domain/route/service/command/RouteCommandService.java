@@ -39,8 +39,8 @@ public class RouteCommandService {
     public void createRoute(RouteReqDTO.CreateRouteDTO createRouteDTO, String email) {
 
         //멤버 객체 생성
-        Member member = memberRepository.findByEmail(email).orElseThrow(
-                () -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+        /*Member member = memberRepository.findByEmail(email).orElseThrow(
+                () -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));*/
         
         //dto에서 리스트 형식으로 선택한 장소들 가져오기
         List<RouteReqDTO.PlaceDTO> newPlaces = createRouteDTO.places();

@@ -40,7 +40,6 @@ public class MemberCommandService {
     private final MemberRepository memberRepository;
     private final JwtUtil jwtUtil;
     private final TokenRepository tokenRepository;
-    private final CustomUserDetailsService userDetailsService;
     private final AuthenticationManager authenticationManager;
 
     //회원 가입(생성)
