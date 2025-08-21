@@ -39,7 +39,7 @@ public class SecurityConfig {
             "/api/v1/members", //회원 가입
             "/api/v1/members/login", //로그인
             "/api/v1/emails", //이메일 인증
-            "/api/v1/emails/codes",
+            "/api/v1/emails/codes", //인증 코드 검증
             "/swagger-ui/**", //스웨거 관련 기능
             "/v3/api-docs/**" //스웨거 관련 기능
     };
@@ -75,7 +75,6 @@ public class SecurityConfig {
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 // cors
                 .cors(cors -> cors.configurationSource(corsConfigurationSource));
-
 
         //최종 SecurityFilterChain 객체 생성
         return http.build();

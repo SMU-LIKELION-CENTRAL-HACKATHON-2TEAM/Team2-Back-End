@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.team2backend.global.entity.BaseEntity;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @AllArgsConstructor
@@ -27,7 +29,15 @@ public class EmailVerification extends BaseEntity {
     @Column(name = "verified")
     private boolean verified;
 
+    @Column(nullable = false)
+    private LocalDateTime expiresAt = LocalDateTime.now().plusSeconds(10);
+
     public void verify(){
         this.verified = true;
+    }
+
+    //민료 여부 반환
+    public boolean isExpired() {
+        return LocalDateTime.now().isAfter(this.expiresAt);
     }
 }

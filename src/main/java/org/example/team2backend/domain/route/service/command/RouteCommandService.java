@@ -3,9 +3,6 @@ package org.example.team2backend.domain.route.service.command;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.team2backend.domain.member.entity.Member;
-import org.example.team2backend.domain.member.exception.MemberErrorCode;
-import org.example.team2backend.domain.member.exception.MemberException;
 import org.example.team2backend.domain.member.repository.MemberRepository;
 import org.example.team2backend.domain.place.entity.Place;
 import org.example.team2backend.domain.place.repository.PlaceRepository;
@@ -36,15 +33,16 @@ public class RouteCommandService {
     private final MemberRepository memberRepository;
 
     //루트 생성
-    //각 장소에 대한 정보를 하나씩 받음
     public void createRoute(RouteReqDTO.CreateRouteDTO createRouteDTO, String email) {
 
-        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+        //멤버 객체 생성
+        /*Member member = memberRepository.findByEmail(email).orElseThrow(
+                () -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));*/
         
-        //dto에서 리스트 형식으로 선택한 장소의 갯수 가져오기
+        //dto에서 리스트 형식으로 선택한 장소들 가져오기
         List<RouteReqDTO.PlaceDTO> newPlaces = createRouteDTO.places();
 
-        // 모든 기존 루트 조회
+        // 모든 기존 루트 조회후 가져오기
         List<Route> existingRoutes = routeRepository.findAll();
 
         //각 루트 마다 비교
@@ -58,7 +56,8 @@ public class RouteCommandService {
 
             boolean isSame = true;
 
-            //루트 안에 속한 장소의 길이와 선택한 장소의 갯수가 다르면 패스
+            //루트 안에 속한 장소의 길이와 선택한 장소의 갯수가 다르면 아래 과정 스킵
+            //길이가 다르면 무조건 다른 루트이기 때문
             if (existingPlaces.size() != newPlaces.size()) {
                 continue;
             }
@@ -83,7 +82,7 @@ public class RouteCommandService {
 
         //루트 만들고 저장
         Route route = toRoute(createRouteDTO);
-        route.linkMember(member);
+        //route.linkMember(member);
         routeRepository.save(route);
         log.info("[ RouteCommandService ] 루트 생성 후 저장.");
 

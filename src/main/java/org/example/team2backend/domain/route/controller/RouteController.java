@@ -4,8 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.User;
-import org.apache.catalina.UserDatabase;
 import org.example.team2backend.domain.route.dto.request.RouteReqDTO;
 import org.example.team2backend.domain.route.dto.response.RouteResDTO;
 import org.example.team2backend.domain.route.service.command.RouteCommandService;
@@ -31,7 +29,7 @@ public class RouteController {
     private final RouteRecommendationService recommendationService;
 
     //루트 생성
-    @Operation(summary = "루트 생성 api", description = "루트 생성 api 입니다.")
+    @Operation(summary = "루트 생성", description = "루트 생성 api 입니다.")
     @PostMapping("")
     public CustomResponse<?> createRoute(@RequestBody RouteReqDTO.CreateRouteDTO createRouteDTO,
                                          @AuthenticationPrincipal UserDetails userDetails) {
@@ -53,7 +51,7 @@ public class RouteController {
     }*/
 
     //루트 추천
-    @Operation(summary = "루트 추천 api", description = "open ai api를 이용하여 거리를 기반으로, 다음 방문 루트를 추천합니다.")
+    @Operation(summary = "루트 추천", description = "open ai api를 이용하여 거리를 기반으로, 다음 방문 루트를 추천합니다.")
     @GetMapping("/recommend")
     public CustomResponse<?> recommendPlaces(
             @RequestParam String address,

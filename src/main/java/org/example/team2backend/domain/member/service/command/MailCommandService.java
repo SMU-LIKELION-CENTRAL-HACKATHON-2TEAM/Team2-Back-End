@@ -4,6 +4,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.team2backend.domain.member.converter.MemberConverter;
 import org.example.team2backend.domain.member.entity.EmailVerification;
 import org.example.team2backend.domain.member.repository.EmailVerificationRepository;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Random;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -23,9 +25,14 @@ public class MailCommandService {
 
     //메일 보내기
     public void sendSimpleMessage(String sendEmail) throws MessagingException {
+
+        //해당 이메일로 발급된 인증 코드 삭제
+        emailVerificationRepository.deleteByEmail(sendEmail);
+
         String number = createNumber();  //랜덤 인증번호 생성
         //메일 생성
         MimeMessage message = createMail(sendEmail, number);
+
         try {
             // 메일 보내기
             javaMailSender.send(message);
