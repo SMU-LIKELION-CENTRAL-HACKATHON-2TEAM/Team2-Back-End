@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.team2backend.domain.place.converter.PlaceConverter;
 import org.example.team2backend.domain.place.dto.request.PlaceReqDTO;
 import org.example.team2backend.domain.place.entity.Place;
+import org.example.team2backend.domain.place.exception.PlaceErrorCode;
+import org.example.team2backend.domain.place.exception.PlaceException;
 import org.example.team2backend.domain.place.repository.PlaceRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,20 +24,22 @@ public class PlaceCommandService {
     //주소 저장
     public void updatePlace(PlaceReqDTO.UpdateReqDTO updateReqDTO) {
 
-        //전달 받은 주소의 kakaoId
+        //전달 받은 주소의 식별값
         String kakaoId = updateReqDTO.kakaoId();
 
+        //식별값으로 장소 조회
         Optional<Place> opt = placeRepository.findByKakaoId(kakaoId);
 
-        //해당 카카오 아이디가 존재한다면
+        //장소가 db에 있다면
         if (opt.isPresent()) {
-            //opt의 내용을 place에 옮겨 담은 뒤, 수정
-            Place place = opt.get(); //opt가 존재한다는 것이 보장 되었으므로 문제 없을 듯 합니다.
+            //opt의 내용을 place에 옮겨 담은 뒤
+            Place place = opt.get();
+            //덮어쓰기
             PlaceConverter.updatePlace(place, updateReqDTO);
-        //해당 카카오 아이디가 존재하지 않는다면
+        //장소가 db에 없다면
         } else {
-            //엔티티로 변환한 후, 저장
-            Place place = PlaceConverter.toPlaceWithKakao(updateReqDTO);
+            //전달 받은 내용을 엔티티로 변환한 후, 저장
+            Place place = PlaceConverter.toPlace(updateReqDTO);
             placeRepository.save(place);
         }
 

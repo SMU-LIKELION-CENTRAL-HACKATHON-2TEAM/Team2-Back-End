@@ -12,7 +12,6 @@ public class RouteResDTO {
             String kakaoId,
             Double lat,
             Double lng,
-            String description,
             Boolean isActivate
     ) {}
 

@@ -17,7 +17,6 @@ public class RouteConverter {
                 .lat(placeDTO.lat())
                 .lng(placeDTO.lng())
                 .isActive(placeDTO.isActivate())
-                .description(placeDTO.description())
                 .build();
     }
 
@@ -39,7 +38,6 @@ public class RouteConverter {
                 place.getKakaoId(),
                 place.getLat(),
                 place.getLng(),
-                place.getDescription(),
                 place.getIsActive()
         );
     }
