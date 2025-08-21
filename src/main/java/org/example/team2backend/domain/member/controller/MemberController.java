@@ -114,4 +114,15 @@ public class MemberController {
 
         return CustomResponse.onSuccess("패스워드 수정 완료");
     }
+
+    @PostMapping("/email")
+    public CustomResponse<String> checkEmail(@RequestBody MemberReqDTO.MailRequestDTO mailRequestDTO) {
+        boolean isDuplicate = memberCommandService.checkEmail(mailRequestDTO.email());
+
+        if (isDuplicate) {
+            return CustomResponse.onSuccess("이미 사용 중인 이메일입니다.");
+        } else {
+            return CustomResponse.onSuccess("사용 가능한 이메일입니다.");
+        }
+    }
 }
