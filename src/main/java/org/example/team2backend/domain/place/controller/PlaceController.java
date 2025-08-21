@@ -19,7 +19,7 @@ public class PlaceController {
     private final PlaceCommandService placeCommandService;
 
     //장소 등록
-    @Operation(summary = "장소 등록 api", description = "전달 받은 장소 정보를 DB에 저장(또는 수정)합니다.")
+    @Operation(summary = "장소 등록", description = "전달 받은 장소 정보를 DB에 저장(또는 수정)합니다.")
     @PostMapping("")
     public CustomResponse<?> updatePlace(@RequestBody PlaceReqDTO.UpdateReqDTO updateReqDTO) {
 

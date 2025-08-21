@@ -12,6 +12,7 @@ import org.example.team2backend.global.apiPayload.CustomResponse;
 import org.example.team2backend.global.security.auth.CustomUserDetails;
 import org.example.team2backend.global.security.jwt.JwtDTO;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,10 +27,10 @@ public class MemberController {
 
     private final MemberCommandService memberCommandService;
     private final MemberQueryService memberQueryService;
-    private final PasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     //회원가입
-    @Operation(summary = "회원가입 API", description = "회원가입 API 입니다.")
+    @Operation(summary = "회원가입", description = "회원가입 API 입니다.")
     @PostMapping("")
     public CustomResponse<?> createUser(@RequestBody MemberReqDTO.SignUpRequestDTO signUpRequestDTO) {
 
@@ -39,7 +40,7 @@ public class MemberController {
     }
 
     //로그인
-    @Operation(summary = "로그인 API", description = "로그인 API 입니다.")
+    @Operation(summary = "로그인", description = "로그인 API 입니다.")
     @PostMapping("/login")
     public CustomResponse<?> login(@RequestBody MemberReqDTO.LoginRequestDTO loginRequestDTO) {
 
@@ -48,7 +49,7 @@ public class MemberController {
 
     //토큰 재발급
     @SecurityRequirement(name = "JWT TOKEN")
-    @Operation(summary = "토큰 재발급 API", description = "토큰 재발급 API 입니다.")
+    @Operation(summary = "토큰 재발급", description = "토큰 재발급 API 입니다.")
     @PostMapping("/reissue")
     public CustomResponse<?> reissueToken(@RequestBody JwtDTO jwtDTO) throws SignatureException {
 

@@ -22,7 +22,7 @@ public class MailController {
 
     private final MemberQueryService memberQueryService;
 
-    @Operation(summary = "인증 코드 발급 API", description = "인증 코드 발급 API 입니다.")
+    @Operation(summary = "인증 코드 발급", description = "인증 코드 발급 API 입니다.")
     @PostMapping("")
     public CustomResponse<String> sendCode(@RequestBody MemberReqDTO.MailRequestDTO mailRequestDTO)
             throws MessagingException {
@@ -32,7 +32,7 @@ public class MailController {
         return CustomResponse.onSuccess("해당 이메일로 인증 코드를 발급했습니다.");
     }
 
-    @Operation(summary = "인증 코드 검증 API", description = "인증 코드 검증 API 입니다.")
+    @Operation(summary = "인증 코드 검증", description = "인증 코드 검증 API 입니다.")
     @PostMapping("/codes")
     public CustomResponse<String> verifyCode(@RequestBody MemberReqDTO.VerifyRequestDTO verifyRequestDTO) {
 
