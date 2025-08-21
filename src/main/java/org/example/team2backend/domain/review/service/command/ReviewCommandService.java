@@ -119,7 +119,7 @@ public class ReviewCommandService {
 
 
     private void saveReviewImage(MultipartFile image, Review review) {
-        String imageKey = s3Service.upload(image);
+        String imageKey = s3Service.upload(image, "review");
         String imageUrl = s3Service.getFileUrl(imageKey);
 
         ReviewImage reviewImage = ReviewConverter.toReviewImage(imageKey, imageUrl, review);

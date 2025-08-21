@@ -20,8 +20,8 @@ public class S3Service {
     private final AmazonS3 amazonS3;
     private final S3ConfigData s3ConfigData;
 
-    public String upload(MultipartFile file) {
-        String key = "reviews/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
+    public String upload(MultipartFile file, String domain) {
+        String key = domain + "/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
         try {
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(file.getSize());
