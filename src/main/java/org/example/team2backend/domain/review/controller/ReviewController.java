@@ -54,10 +54,11 @@ public class ReviewController {
         return CustomResponse.onSuccess("리뷰 좋아요/취소가 완료됐습니다.");
     }
 
-     @GetMapping("/me")
+    @Operation(summary = "내가 작성한 리뷰 조회", description = "본인이 작성한 리뷰가 존재하는 장소를 커서 기반 페이지네이션 하여 조회합니다.")
+    @GetMapping("/me")
      public CustomResponse<ReviewResponseDTO.CursorResDTO<ReviewResponseDTO.MyReviewResDTO>> getMyReviews(
-             @RequestParam(required = false) Long cursor,
-             @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "커서 (null 또는 0이면 첫 페이지)") @RequestParam(required = false) Long cursor,
+            @Parameter(description = "페이지 크기") @RequestParam(defaultValue = "10") int size,
              @AuthenticationPrincipal UserDetails userDetails
      ){
           return CustomResponse.onSuccess(reviewQueryService.getMyReviews(userDetails.getUsername(), cursor, size));
