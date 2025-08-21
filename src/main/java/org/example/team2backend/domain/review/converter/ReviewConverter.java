@@ -5,6 +5,7 @@ import org.example.team2backend.domain.review.dto.response.ReviewResponseDTO;
 import org.example.team2backend.domain.review.entity.Review;
 import org.example.team2backend.domain.review.entity.ReviewImage;
 import org.example.team2backend.domain.review.entity.ReviewLike;
+import org.example.team2backend.domain.route.entity.Route;
 import org.springframework.data.domain.Slice;
 
 import java.util.List;
@@ -58,15 +59,13 @@ public class ReviewConverter {
                 .build();
     }
 
-    public static ReviewResponseDTO.MyReviewResDTO toMyReviewResDTO(Review review, List<ReviewImage> reviewImages) {
+    public static ReviewResponseDTO.MyReviewResDTO toMyReviewResDTO(Route route, String startPlace) {
         return ReviewResponseDTO.MyReviewResDTO.builder()
-                .reviewId(review.getId())
-                .content(review.getContent())
-                .images(reviewImages.stream()
-                        .map(ReviewImage::getImageUrl)
-                        .toList())
-                .createdAt(review.getCreatedAt())
-                .updatedAt(review.getUpdatedAt())
+                .routeId(route.getId())
+                .name(route.getName())
+                .startPlace(startPlace)
+                .createdAt(route.getCreatedAt())
+                .updatedAt(route.getUpdatedAt())
                 .build();
     }
 
@@ -90,13 +89,12 @@ public class ReviewConverter {
                 .nextCursor(nextCursor)
                 .build();
     }
-
     public static ReviewResponseDTO.CursorResDTO<ReviewResponseDTO.MyReviewResDTO> toMyReviewSliceResponse(
-            Slice<Review> slice,
-            Map<Long, List<ReviewImage>> imageMap
+            Slice<Route> slice,
+            Map<Long, String> firstPlaceMap
     ) {
         List<ReviewResponseDTO.MyReviewResDTO> dtos = slice.getContent().stream()
-                .map(review -> toMyReviewResDTO(review, imageMap.getOrDefault(review.getId(), List.of())))
+                .map(route -> toMyReviewResDTO(route, firstPlaceMap.getOrDefault(route.getId(), "장소 없음")))
                 .toList();
 
         Long nextCursor = slice.hasNext()

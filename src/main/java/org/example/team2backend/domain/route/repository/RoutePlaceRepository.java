@@ -15,5 +15,11 @@ public interface RoutePlaceRepository extends JpaRepository<RoutePlace, Long> {
     @Query("SELECT rp FROM RoutePlace rp JOIN FETCH rp.place WHERE rp.route.id = :routeId ORDER BY rp.visitOrder ASC")
     List<RoutePlace> findAllByKakaoId(@Param("kakaoId") Long kakaoId);
 
-
+    @Query("SELECT rp FROM RoutePlace rp " +
+            "JOIN FETCH rp.place " +
+            "WHERE rp.route.id IN :routeIds AND rp.visitOrder = :visitOrder")
+    List<RoutePlace> findByRouteIdInAndVisitOrder(
+            @Param("routeIds") List<Long> routeIds,
+            @Param("visitOrder") Integer visitOrder
+    );
 }
