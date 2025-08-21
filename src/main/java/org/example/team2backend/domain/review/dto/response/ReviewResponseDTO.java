@@ -33,9 +33,10 @@ public class ReviewResponseDTO {
 
     @Builder
     public record MyReviewResDTO(
-            Long reviewId,
-            String content,
-            List<String> images,
+            Long routeId,
+            String name,
+            String startPlace,
+            //TODO : 루트 사진 ( 첫번째 장소 사진 ) 추가
             LocalDateTime createdAt,
             LocalDateTime updatedAt
     ) {}

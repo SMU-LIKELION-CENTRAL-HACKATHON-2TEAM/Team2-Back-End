@@ -13,6 +13,8 @@ import org.example.team2backend.domain.review.repository.ReviewImageRepository;
 import org.example.team2backend.domain.review.repository.ReviewLikeRepository;
 import org.example.team2backend.domain.review.repository.ReviewRepository;
 import org.example.team2backend.domain.route.entity.Route;
+import org.example.team2backend.domain.route.entity.RoutePlace;
+import org.example.team2backend.domain.route.repository.RoutePlaceRepository;
 import org.example.team2backend.domain.route.repository.RouteRepository;
 import org.example.team2backend.global.apiPayload.code.RouteErrorCode;
 import org.example.team2backend.global.apiPayload.exception.RouteException;
@@ -37,6 +39,7 @@ public class ReviewQueryService {
     private final RouteRepository routeRepository;
     private final MemberRepository memberRepository;
     private final ReviewLikeRepository reviewLikeRepository;
+    private final RoutePlaceRepository routePlaceRepository;
 
     public ReviewResponseDTO.CursorResDTO<ReviewResponseDTO.ReviewResDTO> getReviews(Long routeId, Long cursor, int size, String email) {
         Member member = getMember(email);
@@ -96,16 +99,14 @@ public class ReviewQueryService {
         Pageable pageable = PageRequest.of(0, size);
         Long effectiveCursorId = getEffectiveCursorId(cursor);
 
-        Slice<Review> slice = reviewRepository
-                .findByMemberAndIdLessThanOrderByIdDesc(member, effectiveCursorId, pageable);
+        // 중복 제거된 Route들을 조회 (리뷰를 남긴 루트만)
+        Slice<Route> slice = routeRepository
+                .findDistinctRoutesWithReviewsByMemberAndIdLessThanOrderByIdDesc(member, effectiveCursorId, pageable);
 
-        Map<Long, List<ReviewImage>> imageMap = slice.getContent().stream()
-                .collect(Collectors.toMap(
-                        Review::getId,
-                        reviewImageRepository::findByReview
-                ));
+        // 각 루트의 첫 번째 장소명을 조회
+        Map<Long, String> firstPlaceMap = getFirstPlaceMap(slice.getContent());
 
-        return ReviewConverter.toMyReviewSliceResponse(slice, imageMap);
+        return ReviewConverter.toMyReviewSliceResponse(slice, firstPlaceMap);
     }
 
     private Long getEffectiveCursorId(Long cursor) {
@@ -117,5 +118,22 @@ public class ReviewQueryService {
 
     private Member getMember(String email) {
         return memberRepository.findByEmail(email).orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    private Map<Long, String> getFirstPlaceMap(List<Route> routes) {
+        List<Long> routeIds = routes.stream()
+                .map(Route::getId)
+                .toList();
+
+        // RoutePlace에서 visitOrder = 1인 것들을 일괄 조회
+        List<RoutePlace> firstPlaces = routePlaceRepository
+                .findByRouteIdInAndVisitOrder(routeIds, 1);
+
+        return firstPlaces.stream()
+                .collect(Collectors.toMap(
+                        rp -> rp.getRoute().getId(),
+                        rp -> rp.getPlace().getName(),
+                        (existing, replacement) -> existing // 중복시 기존값 유지
+                ));
     }
 }
