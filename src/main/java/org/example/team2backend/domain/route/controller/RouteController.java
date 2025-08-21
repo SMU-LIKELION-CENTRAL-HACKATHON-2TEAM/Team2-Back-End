@@ -4,8 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.User;
-import org.apache.catalina.UserDatabase;
 import org.example.team2backend.domain.route.dto.request.RouteReqDTO;
 import org.example.team2backend.domain.route.dto.response.RouteResDTO;
 import org.example.team2backend.domain.route.service.command.RouteCommandService;
