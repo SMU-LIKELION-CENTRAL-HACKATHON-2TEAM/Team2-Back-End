@@ -14,7 +14,6 @@ import org.example.team2backend.global.apiPayload.code.AuthErrorCode;
 import org.example.team2backend.global.apiPayload.exception.CustomException;
 import org.example.team2backend.global.security.auth.AuthException;
 import org.example.team2backend.global.security.auth.CustomUserDetails;
-import org.example.team2backend.global.security.auth.CustomUserDetailsService;
 import org.example.team2backend.global.security.jwt.JwtDTO;
 import org.example.team2backend.global.security.jwt.JwtUtil;
 import org.springframework.security.authentication.AuthenticationManager;
