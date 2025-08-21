@@ -25,6 +25,7 @@ public class MemberQueryService {
     private final MemberRepository memberRepository;
     private final EmailVerificationRepository emailVerificationRepository;
 
+    //회원 정보 조회
     public MemberResDTO.MemberResponseDTO showMemberInfo(
             String email) {
 

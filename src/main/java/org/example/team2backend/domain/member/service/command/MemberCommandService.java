@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.team2backend.domain.member.converter.MemberConverter;
 import org.example.team2backend.domain.member.dto.request.MemberReqDTO;
 import org.example.team2backend.domain.member.entity.Member;
+import org.example.team2backend.domain.member.exception.MemberErrorCode;
+import org.example.team2backend.domain.member.exception.MemberException;
 import org.example.team2backend.domain.member.repository.TokenRepository;
 import org.example.team2backend.domain.member.repository.MemberRepository;
 import org.example.team2backend.global.apiPayload.code.AuthErrorCode;
@@ -15,6 +17,12 @@ import org.example.team2backend.global.security.auth.CustomUserDetails;
 import org.example.team2backend.global.security.auth.CustomUserDetailsService;
 import org.example.team2backend.global.security.jwt.JwtDTO;
 import org.example.team2backend.global.security.jwt.JwtUtil;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SignatureException;
@@ -28,20 +36,20 @@ import static org.example.team2backend.domain.member.exception.MemberErrorCode.S
 @RequiredArgsConstructor
 @Transactional
 public class MemberCommandService {
+
     private final MemberRepository memberRepository;
-
     private final JwtUtil jwtUtil;
-
     private final TokenRepository tokenRepository;
-
     private final CustomUserDetailsService userDetailsService;
+    private final AuthenticationManager authenticationManager;
 
     //회원 가입(생성)
-    public void createUser(MemberReqDTO.SignUpRequestDTO signUpRequestDTO) {
-        Member member = MemberConverter.toMember(signUpRequestDTO);
+    public void createUser(MemberReqDTO.SignUpRequestDTO signUpRequestDTO, PasswordEncoder passwordEncoder) {
+        //멤버 생성
+        Member member = MemberConverter.toMember(signUpRequestDTO, passwordEncoder);
         //입력한 패스워드가 확인용 패스워드와 다르다면 예외 발생
         if (!signUpRequestDTO.password().equals(signUpRequestDTO.confirmPassword())) {
-            throw new AuthException(AuthErrorCode.BAD_REQUEST_400);
+            throw new MemberException(MemberErrorCode.PASSWORD_MISMATCH);
         }
         //이메일이 db에 없다면 추가 이미 있으면 예외 발생
         if (memberRepository.findByEmail(signUpRequestDTO.email()).isEmpty()) {
@@ -63,14 +71,32 @@ public class MemberCommandService {
         }
     }
 
+    //로그인
     public JwtDTO login(MemberReqDTO.LoginRequestDTO loginRequestDTO) {
 
-        String email = loginRequestDTO.email();
+        //email + password 기반 인증 토큰 생성
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(
+                        loginRequestDTO.email(),
+                        loginRequestDTO.password()
+                );
 
-        CustomUserDetails userDetails = (CustomUserDetails)userDetailsService.loadUserByUsername(email);
+        try {
+            // 실제 인증 (UserDetailsService + PasswordEncoder 자동 적용)
+            Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
-        return new JwtDTO(jwtUtil.createJwtAccessToken(userDetails),
-                jwtUtil.createJwtRefreshToken(userDetails));
+            // 인증 성공 시 CustomUserDetails 반환
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+            return new JwtDTO(jwtUtil.createJwtAccessToken(userDetails),
+                    jwtUtil.createJwtRefreshToken(userDetails));
+        //이메일이 잘못 되었을 경우
+        } catch (UsernameNotFoundException e) {
+            throw new MemberException(MemberErrorCode.MEMBER_NOT_FOUND);
+        //패스워드가 잘못 되었을 경우
+        } catch (BadCredentialsException e){
+            throw new MemberException(MemberErrorCode.INVALID_CREDENTIALS);
+        }
     }
 
 

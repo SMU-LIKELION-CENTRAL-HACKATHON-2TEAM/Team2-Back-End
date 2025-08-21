@@ -12,6 +12,7 @@ import org.example.team2backend.global.apiPayload.CustomResponse;
 import org.example.team2backend.global.security.auth.CustomUserDetails;
 import org.example.team2backend.global.security.jwt.JwtDTO;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.SignatureException;
@@ -25,13 +26,14 @@ public class MemberController {
 
     private final MemberCommandService memberCommandService;
     private final MemberQueryService memberQueryService;
+    private final PasswordEncoder passwordEncoder;
 
     //회원가입
     @Operation(summary = "회원가입 API", description = "회원가입 API 입니다.")
     @PostMapping("")
     public CustomResponse<?> createUser(@RequestBody MemberReqDTO.SignUpRequestDTO signUpRequestDTO) {
 
-        memberCommandService.createUser(signUpRequestDTO);
+        memberCommandService.createUser(signUpRequestDTO, passwordEncoder);
 
         return CustomResponse.onSuccess("회원가입 완료");
     }

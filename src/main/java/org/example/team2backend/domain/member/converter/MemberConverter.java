@@ -5,13 +5,15 @@ import org.example.team2backend.domain.member.entity.EmailVerification;
 import org.example.team2backend.domain.member.entity.Member;
 import org.example.team2backend.domain.member.entity.SocialType;
 import org.example.team2backend.global.security.auth.Roles;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class MemberConverter {
 
-    public static Member toMember(MemberReqDTO.SignUpRequestDTO signUpRequestDTO) {
+    public static Member toMember(MemberReqDTO.SignUpRequestDTO signUpRequestDTO, PasswordEncoder passwordEncoder) {
+        String encodedPassword = passwordEncoder.encode(signUpRequestDTO.password());
         return Member.builder()
                 .email(signUpRequestDTO.email())
-                .password(signUpRequestDTO.password())
+                .password(encodedPassword)
                 .nickname(signUpRequestDTO.nickname())
                 .role(Roles.ROLE_USER)
                 .socialType(SocialType.CUSTOM)

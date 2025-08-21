@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 import org.example.team2backend.global.entity.BaseEntity;
 import org.example.team2backend.global.security.auth.Roles;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -35,4 +38,7 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "social_type", nullable = false)
     private SocialType socialType;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberRoute> memberRoutes = new ArrayList<>();
 }

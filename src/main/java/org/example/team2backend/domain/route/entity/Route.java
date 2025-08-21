@@ -35,11 +35,11 @@ public class Route extends BaseEntity {
     @Column(name = "save_count")
     private Long saveCount;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+   /* @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private Member member;
 
     public void linkMember(Member member){
         this.member = member;
-    }
+    }*/
 }
