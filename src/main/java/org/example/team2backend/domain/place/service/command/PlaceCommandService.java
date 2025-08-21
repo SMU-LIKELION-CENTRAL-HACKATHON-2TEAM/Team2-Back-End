@@ -5,8 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.team2backend.domain.place.converter.PlaceConverter;
 import org.example.team2backend.domain.place.dto.request.PlaceReqDTO;
 import org.example.team2backend.domain.place.entity.Place;
-import org.example.team2backend.domain.place.exception.PlaceErrorCode;
-import org.example.team2backend.domain.place.exception.PlaceException;
 import org.example.team2backend.domain.place.repository.PlaceRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
