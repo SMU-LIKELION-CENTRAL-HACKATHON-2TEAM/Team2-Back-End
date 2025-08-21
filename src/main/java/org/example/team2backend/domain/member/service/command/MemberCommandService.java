@@ -116,4 +116,9 @@ public class MemberCommandService {
 
         memberRepository.updatePasswordByEmail(email, newPassword);
     }
+
+    public boolean checkEmail(String email) {
+        return memberRepository.findByEmail(email).isPresent();
+    }
+
 }
