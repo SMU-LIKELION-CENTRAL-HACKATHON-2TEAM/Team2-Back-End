@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.example.team2backend.global.entity.BaseEntity;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter //모든 필드에 대해 setter가 필요하기 때문
@@ -39,6 +41,10 @@ public class Place extends BaseEntity {
     //경도
     @Column(name = "lng")
     private Double lng;
+
+    //이미지 url들
+    @Column(name = "image_urls")
+    private List<String> imageUrls;
 
     @Column(name = "is_active")
     private Boolean isActive;

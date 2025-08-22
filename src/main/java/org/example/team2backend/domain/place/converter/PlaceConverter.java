@@ -2,6 +2,7 @@ package org.example.team2backend.domain.place.converter;
 
 import org.example.team2backend.domain.place.dto.request.PlaceReqDTO;
 import org.example.team2backend.domain.place.entity.Place;
+import org.example.team2backend.domain.place.entity.PlaceImage;
 
 public class PlaceConverter {
 
@@ -15,6 +16,7 @@ public class PlaceConverter {
                 .lat(updateReqDTO.lat())
                 .lng(updateReqDTO.lng())
                 .isActive(updateReqDTO.isActive())
+                .imageUrls(updateReqDTO.imageUrls())
                 .build();
 
     }
@@ -28,5 +30,13 @@ public class PlaceConverter {
         place.setLat(updateReqDTO.lat());
         place.setLng(updateReqDTO.lng());
         place.setIsActive(updateReqDTO.isActive());
+    }
+
+    public static PlaceImage toPlaceImage(String imageKey, String imageUrl, Place place) {
+        return PlaceImage.builder()
+                .imageKey(imageKey)
+                .imageUrl(imageUrl)
+                .place(place)
+                .build();
     }
 }
