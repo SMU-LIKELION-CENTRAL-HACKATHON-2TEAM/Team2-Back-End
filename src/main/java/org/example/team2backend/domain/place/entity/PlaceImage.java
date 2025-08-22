@@ -23,6 +23,6 @@ public class PlaceImage {
     private String imageKey;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "place_id")
+    @JoinColumn(name = " place_id")
     private Place place;
 }

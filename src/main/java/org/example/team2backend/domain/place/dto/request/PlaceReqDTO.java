@@ -10,7 +10,6 @@ public class PlaceReqDTO {
             String kakaoId,
             Double lat,
             Double lng,
-            Boolean isActive,
-            List<String> imageUrls
+            Boolean isActive
     ) {}
 }

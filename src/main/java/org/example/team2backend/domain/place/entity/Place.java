@@ -42,10 +42,6 @@ public class Place extends BaseEntity {
     @Column(name = "lng")
     private Double lng;
 
-    //이미지 url들
-    @Column(name = "image_urls")
-    private List<String> imageUrls;
-
     @Column(name = "is_active")
     private Boolean isActive;
 

@@ -16,7 +16,6 @@ public class PlaceConverter {
                 .lat(updateReqDTO.lat())
                 .lng(updateReqDTO.lng())
                 .isActive(updateReqDTO.isActive())
-                .imageUrls(updateReqDTO.imageUrls())
                 .build();
 
     }
