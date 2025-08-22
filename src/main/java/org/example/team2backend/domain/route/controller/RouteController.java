@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.team2backend.domain.route.dto.request.RouteReqDTO;
 import org.example.team2backend.domain.route.dto.response.RouteResDTO;
 import org.example.team2backend.domain.route.service.command.RouteCommandService;
-import org.example.team2backend.domain.route.service.query.RouteQueryService;
 import org.example.team2backend.domain.route.service.query.RouteRecommendationService;
 import org.example.team2backend.global.apiPayload.CustomResponse;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
