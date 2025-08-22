@@ -10,7 +10,7 @@ public class RouteReqDTO {
             String kakaoId,
             Double lat,
             Double lng,
-            Boolean isActivate
+            Boolean isActive
     ) {}
     public record CreateRouteDTO(
             String routeName,

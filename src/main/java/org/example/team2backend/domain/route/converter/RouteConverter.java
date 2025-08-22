@@ -1,10 +1,12 @@
 package org.example.team2backend.domain.route.converter;
 
 
+import org.example.team2backend.domain.member.entity.Member;
 import org.example.team2backend.domain.place.entity.Place;
 import org.example.team2backend.domain.route.dto.request.RouteReqDTO;
 import org.example.team2backend.domain.route.dto.response.RouteResDTO;
 import org.example.team2backend.domain.route.entity.Route;
+import org.example.team2backend.domain.route.entity.RouteLike;
 
 public class RouteConverter {
 
@@ -16,7 +18,7 @@ public class RouteConverter {
                 .kakaoId(placeDTO.kakaoId())
                 .lat(placeDTO.lat())
                 .lng(placeDTO.lng())
-                .isActive(placeDTO.isActivate())
+                .isActive(placeDTO.isActive())
                 .build();
     }
 
@@ -26,6 +28,13 @@ public class RouteConverter {
                 .name(createRouteDTO.routeName())
                 .saveCount(0L)
                 .visitCount(0L)
+                .build();
+    }
+
+    public static RouteLike toRouteLike(Route route, Member member) {
+        return RouteLike.builder()
+                .route(route)
+                .member(member)
                 .build();
     }
 

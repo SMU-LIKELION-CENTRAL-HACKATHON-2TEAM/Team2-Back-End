@@ -9,18 +9,23 @@ import org.example.team2backend.domain.member.exception.MemberException;
 import org.example.team2backend.domain.member.repository.MemberRepository;
 import org.example.team2backend.domain.place.entity.Place;
 import org.example.team2backend.domain.place.repository.PlaceRepository;
+import org.example.team2backend.domain.review.converter.ReviewConverter;
+import org.example.team2backend.domain.review.entity.ReviewLike;
 import org.example.team2backend.domain.route.converter.RouteConverter;
 import org.example.team2backend.domain.route.dto.request.RouteReqDTO;
 import org.example.team2backend.domain.route.entity.Route;
+import org.example.team2backend.domain.route.entity.RouteLike;
 import org.example.team2backend.domain.route.entity.RoutePlace;
 import org.example.team2backend.domain.route.exception.RouteErrorCode;
 import org.example.team2backend.domain.route.exception.RouteException;
+import org.example.team2backend.domain.route.repository.RouteLikeRepository;
 import org.example.team2backend.domain.route.repository.RoutePlaceRepository;
 import org.example.team2backend.domain.route.repository.RouteRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import static org.example.team2backend.domain.route.converter.RouteConverter.toRoute;
 
@@ -34,6 +39,7 @@ public class RouteCommandService {
     private final RoutePlaceRepository routePlaceRepository;
     private final PlaceRepository placeRepository;
     private final MemberRepository memberRepository;
+    private final RouteLikeRepository routeLikeRepository;
 
     //루트 생성
     public void createRoute(RouteReqDTO.CreateRouteDTO createRouteDTO, String email) {
@@ -112,4 +118,26 @@ public class RouteCommandService {
         }
         log.info("[ RouteCommandService ] 매핑 테이블 저장 완료.");
     }
+
+    //리뷰 토글
+    public void toggleLike(String email, Long routeId) {
+        Route route = routeRepository.findById(routeId)
+                .orElseThrow(() -> new RouteException(RouteErrorCode.ROUTE_NOT_FOUND));
+
+        Member member = getMember(email);
+
+        Optional<RouteLike> existingLike = routeLikeRepository.findByRouteAndMember(route, member);
+
+        if (existingLike.isPresent()) {
+            routeLikeRepository.delete(existingLike.get());
+        } else {
+            RouteLike routeLike = RouteConverter.toRouteLike(route, member);
+            routeLikeRepository.save(routeLike);
+        }
+    }
+
+    private Member getMember(String email){
+        return memberRepository.findByEmail(email).orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+    }
+
 }

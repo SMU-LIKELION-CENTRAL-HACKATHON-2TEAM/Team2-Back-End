@@ -1,6 +1,7 @@
 package org.example.team2backend.domain.route.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,6 +59,20 @@ public class RouteController {
 
         List<RouteResDTO.RouteDTO> routes = recommendationService.recommendRoutes(address, lat, lng);
         return CustomResponse.onSuccess(routes);
+    }
+
+    //루트 좋아요
+    @Operation(summary = "루트 좋아요 토글", description = "루트에 좋아요/좋아요 취소를 합니다.")
+    @PostMapping("/routes/{routeId}")
+    public CustomResponse<?> likeRoute(
+            @Parameter(description = "루트 ID") @PathVariable Long routeId,
+        @AuthenticationPrincipal UserDetails userDetails) {
+
+        String email = userDetails.getUsername();
+
+        routeCommandService.toggleLike(email, routeId);
+
+        return CustomResponse.onSuccess("루트 좋아요/취소가 완료되었습니다.");
     }
 
 }
