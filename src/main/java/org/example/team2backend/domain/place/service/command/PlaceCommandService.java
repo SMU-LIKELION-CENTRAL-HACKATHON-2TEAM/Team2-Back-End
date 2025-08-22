@@ -13,6 +13,7 @@ import org.example.team2backend.domain.place.repository.PlaceRepository;
 import org.example.team2backend.global.s3.service.S3Service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -34,9 +35,6 @@ public class PlaceCommandService {
         //전달 받은 주소의 식별값
         String kakaoId = updateReqDTO.kakaoId();
 
-        //식별값으로 장소 조회
-        Optional<Place> opt = placeRepository.findByKakaoId(kakaoId);
-
         //장소가 있으면 업데이트 후 장소 반환
         Place place = placeRepository.findByKakaoId(kakaoId)
                 .map(existing -> {
@@ -52,14 +50,19 @@ public class PlaceCommandService {
 
         //이미지 갯수 검증 후 등록
         validateImageCount(images);
-        placeImageRepository.deleteByPlace(place);
-        images.forEach(image -> savePlaceImage(image, place));
+
+        if (CollectionUtils.isEmpty(images)) {
+            placeImageRepository.deleteByPlace(place);
+        } else {
+            placeImageRepository.deleteByPlace(place);
+            images.forEach(image -> savePlaceImage(image, place));
+        }
 
         log.info("[ PlaceCommandController ] 장소 업데이트 완료");
     }
 
     private void validateImageCount(List<MultipartFile> images) {
-        if (images.size() > 1) {
+        if (images != null && images.size() > 1) {
             throw new PlaceException(PlaceErrorCode.PLACE_IMAGE_LIMIT);
         }
     }

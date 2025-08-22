@@ -25,7 +25,6 @@ import java.util.List;
 public class RouteController {
 
     private final RouteCommandService routeCommandService;
-    private final RouteQueryService routeQueryService;
     private final RouteRecommendationService recommendationService;
 
     //루트 생성

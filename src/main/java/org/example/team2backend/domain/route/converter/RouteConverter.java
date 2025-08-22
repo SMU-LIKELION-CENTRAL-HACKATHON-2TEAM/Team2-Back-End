@@ -8,7 +8,7 @@ import org.example.team2backend.domain.route.entity.Route;
 
 public class RouteConverter {
 
-    public static Place toPlaceWithKakao(RouteReqDTO.PlaceDTO placeDTO) {
+    public static Place toPlace(RouteReqDTO.PlaceDTO placeDTO) {
         return Place.builder()
                 .name(placeDTO.placeName())
                 .category(placeDTO.category())
