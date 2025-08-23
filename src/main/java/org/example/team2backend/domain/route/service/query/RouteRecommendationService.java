@@ -59,7 +59,8 @@ public class RouteRecommendationService {
 
         //AI에게 5개 추천하도록 요청
         prompt.append("\n이 중에서 추천 루트 5개를 선택해라.\n")
-                .append("출력은 반드시 JSON 배열 형식으로 반환하라. 다른 설명은 절대 하지 마라.\n")
+                .append("출력은 반드시 **배열(JSON array)** 형식으로만 반환하라.\n")
+                .append("절대 객체로 감싸지 말고, 절대 다른 텍스트나 설명을 추가하지 마라.\n")
                 .append("형식:\n")
                 .append("[\n")
                 .append("  { \"routeId\": 숫자, \"reason\": \"추천 이유\" },\n")
@@ -77,7 +78,19 @@ public class RouteRecommendationService {
         String content = root.get("choices").get(0).get("message").get("content").asText();
 
         //응답을 RouteDTO 배열로 변환
-        List<RouteResDTO.SimpleRouteDTO> aiResults = Arrays.asList(mapper.readValue(content, RouteResDTO.SimpleRouteDTO[].class));
+        List<RouteResDTO.SimpleRouteDTO> aiResults;
+        if (content.startsWith("[")) {
+            aiResults = Arrays.asList(mapper.readValue(content, RouteResDTO.SimpleRouteDTO[].class));
+        } else if (content.startsWith("{")) {
+            // wrapper 객체일 경우
+            record RoutesWrapper(List<RouteResDTO.SimpleRouteDTO> routes) {}
+            RoutesWrapper wrapper = mapper.readValue(content, RoutesWrapper.class);
+            aiResults = wrapper.routes();
+        } else {
+            throw new IOException("Unexpected AI response format: " + content);
+        }
+
+
         List<Long> routeIds = aiResults.stream()
                 .map(RouteResDTO.SimpleRouteDTO::routeId)
                 .toList();
