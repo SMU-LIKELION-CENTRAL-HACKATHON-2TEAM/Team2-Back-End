@@ -1,15 +1,16 @@
 package org.example.team2backend.global.converter;
-
 import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Type;
 
 @Component
 public class MultipartJackson2HttpMessageConverter extends AbstractJackson2HttpMessageConverter {
-
     public MultipartJackson2HttpMessageConverter(ObjectMapper objectMapper) {
         super(objectMapper, MediaType.APPLICATION_OCTET_STREAM);
     }
@@ -28,6 +29,4 @@ public class MultipartJackson2HttpMessageConverter extends AbstractJackson2HttpM
     protected boolean canWrite(MediaType mediaType) {
         return false;
     }
-
-
 }
