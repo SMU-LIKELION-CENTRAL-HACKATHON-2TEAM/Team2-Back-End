@@ -26,8 +26,9 @@ public class OpenAiService {
 
         Map<String, Object> body = Map.of(
                 "model", "gpt-4o-mini",
-                "messages", List.of(Map.of("role", "user", "content", prompt)),
-                "response_format", Map.of("type", "json_object"), // JSON 형식 강제
+                "messages", List.of(
+                        Map.of("role", "system", "content", "너는 JSON 생성기다. 절대 설명 없이 JSON만 반환해야 한다."),
+                        Map.of("role", "user", "content", prompt)),
                 "max_tokens", 800
         );
 

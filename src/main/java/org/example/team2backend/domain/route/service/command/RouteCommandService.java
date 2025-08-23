@@ -124,7 +124,8 @@ public class RouteCommandService {
 
     public String generateSummaryByAI(List<RouteReqDTO.PlaceDTO> places) {
         StringBuilder prompt = new StringBuilder();
-        prompt.append("다음 장소들을 연결한 여행 루트를 한 문장으로 요약해줘:\n");
+        prompt.append("다음 장소들을 연결한 여행 루트를 한 문장으로 요약해줘:\n")
+                .append("반드시 JSON 객체로만 답하라. 형식은 {\"요약\": \"...\"} 이다.\n");
 
         for (RouteReqDTO.PlaceDTO p : places) {
             prompt.append("- ").append(p.placeName()).append(" (").append(p.category()).append(")\n");
@@ -133,7 +134,19 @@ public class RouteCommandService {
         try {
             String aiResponse = openAiService.getChatCompletion(prompt.toString());
             JsonNode root = new ObjectMapper().readTree(aiResponse);
-            return root.get("choices").get(0).get("message").get("content").asText();
+            String content =  root.get("choices").get(0).get("message").get("content").asText().trim();
+
+            // content가 JSON 객체일 경우 파싱
+            if (content.startsWith("{")) {
+                JsonNode contentNode = new ObjectMapper().readTree(content);
+                if (contentNode.has("요약")) {
+                    return contentNode.get("요약").asText();
+                } else if (contentNode.has("summary")) {
+                    return contentNode.get("summary").asText();
+                }
+            }
+            // fallback: 그냥 텍스트 반환
+            return content;
         } catch (Exception e) {
             log.warn("AI summary 생성 실패, 기본 summary 사용", e);
             return "사용자 지정 여행 루트";
