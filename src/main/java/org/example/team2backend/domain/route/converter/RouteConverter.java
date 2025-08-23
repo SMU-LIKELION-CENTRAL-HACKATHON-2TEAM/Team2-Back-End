@@ -25,7 +25,7 @@ public class RouteConverter {
         return Route.builder()
                 .name(createRouteDTO.routeName())
                 .bookmarked(0L)
-                .visitCount(0L)
+                .viewCount(0L)
                 .isBookmarked(false)
                 .build();
     }
