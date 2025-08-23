@@ -27,8 +27,9 @@ public class PlaceController {
             description = "멀티파트 요청으로 장소 JSON + 이미지 파일을 함께 업로드합니다.")
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public CustomResponse<?> updatePlace(
-            @RequestPart("place") PlaceReqDTO.UpdateReqDTO updateReqDTO,   // JSON 부분
-            @RequestPart(value = "images", required = false) List<MultipartFile> images) {
+            @RequestPart(value = "images", required = false) List<MultipartFile> images,
+            @RequestPart("place") PlaceReqDTO.UpdateReqDTO updateReqDTO
+            ) {
 
         placeCommandService.updatePlace(updateReqDTO, images);
 
