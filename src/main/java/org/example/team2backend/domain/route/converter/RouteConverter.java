@@ -8,7 +8,7 @@ import org.example.team2backend.domain.route.entity.Route;
 
 public class RouteConverter {
 
-    public static Place toPlaceWithKakao(RouteReqDTO.PlaceDTO placeDTO) {
+    public static Place toPlace(RouteReqDTO.PlaceDTO placeDTO) {
         return Place.builder()
                 .name(placeDTO.placeName())
                 .category(placeDTO.category())
@@ -17,7 +17,6 @@ public class RouteConverter {
                 .lat(placeDTO.lat())
                 .lng(placeDTO.lng())
                 .isActive(placeDTO.isActivate())
-                .description(placeDTO.description())
                 .build();
     }
 
@@ -39,7 +38,6 @@ public class RouteConverter {
                 place.getKakaoId(),
                 place.getLat(),
                 place.getLng(),
-                place.getDescription(),
                 place.getIsActive()
         );
     }

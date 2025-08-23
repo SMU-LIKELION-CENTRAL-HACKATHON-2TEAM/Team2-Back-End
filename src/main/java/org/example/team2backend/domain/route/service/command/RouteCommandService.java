@@ -3,6 +3,9 @@ package org.example.team2backend.domain.route.service.command;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.team2backend.domain.member.entity.Member;
+import org.example.team2backend.domain.member.exception.MemberErrorCode;
+import org.example.team2backend.domain.member.exception.MemberException;
 import org.example.team2backend.domain.member.repository.MemberRepository;
 import org.example.team2backend.domain.place.entity.Place;
 import org.example.team2backend.domain.place.repository.PlaceRepository;
@@ -36,8 +39,8 @@ public class RouteCommandService {
     public void createRoute(RouteReqDTO.CreateRouteDTO createRouteDTO, String email) {
 
         //멤버 객체 생성
-        /*Member member = memberRepository.findByEmail(email).orElseThrow(
-                () -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));*/
+        Member member = memberRepository.findByEmail(email).orElseThrow(
+                () -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
         
         //dto에서 리스트 형식으로 선택한 장소들 가져오기
         List<RouteReqDTO.PlaceDTO> newPlaces = createRouteDTO.places();
@@ -80,19 +83,21 @@ public class RouteCommandService {
             }
         }
 
+        //모든 루트를 전부 검사했을 때, 중복되는 루트가 없으면
         //루트 만들고 저장
         Route route = toRoute(createRouteDTO);
-        //route.linkMember(member);
+        route.linkMember(member);
         routeRepository.save(route);
         log.info("[ RouteCommandService ] 루트 생성 후 저장.");
 
+        //등록한 장소 마다 저장 후 매핑 테이블 생성
         for (int i = 0; i < newPlaces.size(); i++) {
             RouteReqDTO.PlaceDTO placeDTO = newPlaces.get(i);
 
             //카카오 아이디로 Place 조회 → 없으면 새로 저장
             log.info("[ RouteCommandService ] kakaoId로 장소를 조회합니다.");
             Place place = placeRepository.findByKakaoId(placeDTO.kakaoId())
-                    .orElseGet(() -> placeRepository.save(RouteConverter.toPlaceWithKakao(placeDTO)));
+                    .orElseGet(() -> placeRepository.save(RouteConverter.toPlace(placeDTO)));
 
             //매핑 테이블(RoutePlace) 생성
             //dto를 변환하는 것이 아니기 때문에 Converter는 사용하지 않았음.

@@ -63,7 +63,6 @@ public class MemberRouteQueryService {
                                         p.getKakaoId(),
                                         p.getLat(),
                                         p.getLng(),
-                                        p.getDescription(),
                                         p.getIsActive()
                                 );
                             })

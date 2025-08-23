@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.example.team2backend.global.entity.BaseEntity;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter //모든 필드에 대해 setter가 필요하기 때문
@@ -13,6 +15,7 @@ import org.example.team2backend.global.entity.BaseEntity;
 @NoArgsConstructor
 @Table(name = "place", uniqueConstraints = @UniqueConstraint(columnNames = {"id", "kakao_id"}))
 public class Place extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -38,9 +41,6 @@ public class Place extends BaseEntity {
     //경도
     @Column(name = "lng")
     private Double lng;
-
-    @Column(name = "description")
-    private String description;
 
     @Column(name = "is_active")
     private Boolean isActive;

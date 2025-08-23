@@ -1,14 +1,16 @@
 package org.example.team2backend.domain.place.dto.request;
 
+import java.util.List;
+
 public class PlaceReqDTO {
     public record UpdateReqDTO(
-            String placeName,
+            String name,
             String category,
             String address,
             String kakaoId,
             Double lat,
             Double lng,
-            String description,
-            Boolean isActivate
+            Boolean isActive,
+            List<String> imageUrls
     ) {}
 }

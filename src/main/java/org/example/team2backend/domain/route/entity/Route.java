@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.example.team2backend.domain.member.entity.Member;
 import org.example.team2backend.global.entity.BaseEntity;
 
 
@@ -34,11 +35,11 @@ public class Route extends BaseEntity {
     @Column(name = "save_count")
     private Long saveCount;
 
-   /* @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private Member member;
 
     public void linkMember(Member member){
         this.member = member;
-    }*/
+    }
 }

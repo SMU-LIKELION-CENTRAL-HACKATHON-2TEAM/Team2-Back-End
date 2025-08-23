@@ -41,7 +41,6 @@ public class RouteRecommendationService {
                     .append("\"kakaoId\": \"").append(p.getKakaoId()).append("\", ")
                     .append("\"lat\": ").append(p.getLat()).append(", ")
                     .append("\"lng\": ").append(p.getLng()).append(", ")
-                    .append("\"description\": \"").append(p.getDescription()).append("\", ")
                     .append("\"isActivate\": ").append(p.getIsActive())
                     .append("}\n");
         }
