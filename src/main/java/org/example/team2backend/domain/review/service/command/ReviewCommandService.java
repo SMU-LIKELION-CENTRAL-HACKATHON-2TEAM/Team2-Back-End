@@ -47,6 +47,9 @@ public class ReviewCommandService {
         review.linkRoute(route);
         reviewRepository.save(review);
 
+        //리뷰 작성 시 방문 횟수 +1
+        routeRepository.increaseVisitCount(routeId);
+
         // 2. 이미지 업로드 및 ReviewImage 저장
         if (images != null && !images.isEmpty()) {
             validateImageCount(images);

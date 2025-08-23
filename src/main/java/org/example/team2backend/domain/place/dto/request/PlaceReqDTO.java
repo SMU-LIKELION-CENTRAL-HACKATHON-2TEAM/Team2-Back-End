@@ -1,7 +1,5 @@
 package org.example.team2backend.domain.place.dto.request;
 
-import java.util.List;
-
 public class PlaceReqDTO {
     public record UpdateReqDTO(
             String name,

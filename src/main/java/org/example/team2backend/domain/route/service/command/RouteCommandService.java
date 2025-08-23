@@ -1,5 +1,7 @@
 package org.example.team2backend.domain.route.service.command;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,23 +11,19 @@ import org.example.team2backend.domain.member.exception.MemberException;
 import org.example.team2backend.domain.member.repository.MemberRepository;
 import org.example.team2backend.domain.place.entity.Place;
 import org.example.team2backend.domain.place.repository.PlaceRepository;
-import org.example.team2backend.domain.review.converter.ReviewConverter;
-import org.example.team2backend.domain.review.entity.ReviewLike;
 import org.example.team2backend.domain.route.converter.RouteConverter;
 import org.example.team2backend.domain.route.dto.request.RouteReqDTO;
 import org.example.team2backend.domain.route.entity.Route;
-import org.example.team2backend.domain.route.entity.RouteLike;
 import org.example.team2backend.domain.route.entity.RoutePlace;
 import org.example.team2backend.domain.route.exception.RouteErrorCode;
 import org.example.team2backend.domain.route.exception.RouteException;
-import org.example.team2backend.domain.route.repository.RouteLikeRepository;
 import org.example.team2backend.domain.route.repository.RoutePlaceRepository;
 import org.example.team2backend.domain.route.repository.RouteRepository;
+import org.example.team2backend.global.openai.OpenAiService;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 import static org.example.team2backend.domain.route.converter.RouteConverter.toRoute;
 
@@ -39,7 +37,7 @@ public class RouteCommandService {
     private final RoutePlaceRepository routePlaceRepository;
     private final PlaceRepository placeRepository;
     private final MemberRepository memberRepository;
-    private final RouteLikeRepository routeLikeRepository;
+    private final OpenAiService openAiService;
 
     //루트 생성
     public void createRoute(RouteReqDTO.CreateRouteDTO createRouteDTO, String email) {
@@ -93,6 +91,11 @@ public class RouteCommandService {
         //루트 만들고 저장
         Route route = toRoute(createRouteDTO);
         route.linkMember(member);
+
+        //AI summary 생성
+        String summary = generateSummaryByAI(newPlaces);
+        route.setSummary(summary);
+
         routeRepository.save(route);
         log.info("[ RouteCommandService ] 루트 생성 후 저장.");
 
@@ -119,25 +122,22 @@ public class RouteCommandService {
         log.info("[ RouteCommandService ] 매핑 테이블 저장 완료.");
     }
 
-    //리뷰 토글
-    public void toggleLike(String email, Long routeId) {
-        Route route = routeRepository.findById(routeId)
-                .orElseThrow(() -> new RouteException(RouteErrorCode.ROUTE_NOT_FOUND));
+    public String generateSummaryByAI(List<RouteReqDTO.PlaceDTO> places) {
+        StringBuilder prompt = new StringBuilder();
+        prompt.append("다음 장소들을 연결한 여행 루트를 한 문장으로 요약해줘:\n");
 
-        Member member = getMember(email);
-
-        Optional<RouteLike> existingLike = routeLikeRepository.findByRouteAndMember(route, member);
-
-        if (existingLike.isPresent()) {
-            routeLikeRepository.delete(existingLike.get());
-        } else {
-            RouteLike routeLike = RouteConverter.toRouteLike(route, member);
-            routeLikeRepository.save(routeLike);
+        for (RouteReqDTO.PlaceDTO p : places) {
+            prompt.append("- ").append(p.placeName()).append(" (").append(p.category()).append(")\n");
         }
-    }
 
-    private Member getMember(String email){
-        return memberRepository.findByEmail(email).orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+        try {
+            String aiResponse = openAiService.getChatCompletion(prompt.toString());
+            JsonNode root = new ObjectMapper().readTree(aiResponse);
+            return root.get("choices").get(0).get("message").get("content").asText();
+        } catch (Exception e) {
+            log.warn("AI summary 생성 실패, 기본 summary 사용", e);
+            return "사용자 지정 여행 루트";
+        }
     }
 
 }

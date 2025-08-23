@@ -6,7 +6,6 @@ import org.example.team2backend.domain.place.entity.Place;
 import org.example.team2backend.domain.route.dto.request.RouteReqDTO;
 import org.example.team2backend.domain.route.dto.response.RouteResDTO;
 import org.example.team2backend.domain.route.entity.Route;
-import org.example.team2backend.domain.route.entity.RouteLike;
 
 public class RouteConverter {
 
@@ -26,15 +25,9 @@ public class RouteConverter {
         //나머지 필드들은 null or 0으로 초기화
         return Route.builder()
                 .name(createRouteDTO.routeName())
-                .saveCount(0L)
+                .bookmarked(0L)
                 .visitCount(0L)
-                .build();
-    }
-
-    public static RouteLike toRouteLike(Route route, Member member) {
-        return RouteLike.builder()
-                .route(route)
-                .member(member)
+                .isBookmarked(false)
                 .build();
     }
 

@@ -6,6 +6,10 @@ import org.example.team2backend.domain.route.entity.Route;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -21,4 +25,7 @@ public interface MemberRouteRepository extends JpaRepository<MemberRoute, Long> 
     Slice<MemberRoute> findByMemberAndIdLessThanOrderByIdDesc(
             Member member, Long cursorId, Pageable pageable
     );
+
+    //스크랩 여부 확인
+    Boolean existsByMemberAndRoute(Member member, Route route);
 }
