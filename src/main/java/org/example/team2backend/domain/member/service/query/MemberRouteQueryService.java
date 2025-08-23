@@ -69,11 +69,14 @@ public class MemberRouteQueryService {
                             .toList();
 
                     return new RouteResDTO.RouteDTO(
-                            route.getId(),                       // routeId
-                            route.getName(),                     // name
+                            route.getId(),
+                            route.getName(),
+                            route.getSummary(),
+                            route.getBookmarked(),
+                            route.getViewCount(),
+                            route.getIsBookmarked(),
                             places.isEmpty() ? null : places.get(0), // startPlace
-                            places.size() > 1 ? places.subList(1, places.size()) : List.of(), // 나머지 장소들
-                            route.getSummary()                   // summary
+                            places.size() > 1 ? places.subList(1, places.size()) : List.of() // 나머지 장소들
                     );
 
                 })

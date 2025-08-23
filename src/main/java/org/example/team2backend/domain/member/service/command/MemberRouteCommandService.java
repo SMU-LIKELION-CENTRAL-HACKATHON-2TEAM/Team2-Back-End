@@ -42,9 +42,13 @@ public class MemberRouteCommandService {
         //만약 테이블이 존재한다면
         if (ExistMr.isPresent()) {
             memberRouteRepository.delete(ExistMr.get());
+            //루트 스크랩 수 1 감소
+            routeRepository.decreaseBookmarked(routeId);
         } else {
             MemberRoute memberRoute = MemberRouteConverter.toMemberRoute(member, route);
             memberRouteRepository.save(memberRoute);
+            //루트 스크랩 수 1 증가
+            routeRepository.increaseBookmarked(routeId);
         }
     }
 }

@@ -4,8 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.team2backend.domain.place.dto.request.PlaceReqDTO;
+import org.example.team2backend.domain.place.service.command.PlaceCommandService;
 import org.example.team2backend.domain.route.dto.request.RouteReqDTO;
-import org.example.team2backend.domain.route.dto.response.RouteResDTO;
 import org.example.team2backend.domain.route.service.command.RouteCommandService;
 import org.example.team2backend.domain.route.service.query.RouteRecommendationService;
 import org.example.team2backend.global.apiPayload.CustomResponse;
@@ -14,7 +15,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -25,6 +25,7 @@ public class RouteController {
 
     private final RouteCommandService routeCommandService;
     private final RouteRecommendationService recommendationService;
+    private final PlaceCommandService placeCommandService;
 
     //루트 생성
     @Operation(summary = "루트 생성", description = "루트 생성 api 입니다.")
@@ -52,12 +53,14 @@ public class RouteController {
     @Operation(summary = "루트 추천", description = "open ai api를 이용하여 거리를 기반으로, 다음 방문 루트를 추천합니다.")
     @GetMapping("/recommend")
     public CustomResponse<?> recommendPlaces(
-            @RequestParam String address,
-            @RequestParam double lat,
-            @RequestParam double lng) throws IOException {
+            @RequestBody PlaceReqDTO.UpdateReqDTO updateReqDTO, @AuthenticationPrincipal  UserDetails userDetails) throws IOException {
 
-        List<RouteResDTO.RouteDTO> routes = recommendationService.recommendRoutes(address, lat, lng);
-        return CustomResponse.onSuccess(routes);
+        String address = updateReqDTO.address();
+
+        String email = userDetails.getUsername();
+
+        return CustomResponse.onSuccess(recommendationService.recommendRoutes(address, email));
     }
+
 
 }

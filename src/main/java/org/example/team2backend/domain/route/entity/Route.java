@@ -29,11 +29,21 @@ public class Route extends BaseEntity {
     @Column(name = "summary")
     private String summary;
 
+    //방문자 수
     @Column(name = "visit_count")
     private Long visitCount;
 
-    @Column(name = "save_count")
-    private Long saveCount;
+    //북마크(스크랩) 수
+    @Column(name = "bookmarked")
+    private Long bookmarked = 0L;
+
+    //조회 수
+    @Column(name = "view_count")
+    private Long viewCount = 0L;
+
+    //사용자의 북마크 여부
+    @Column(name = "is_bookmarked")
+    private Boolean isBookmarked;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -41,5 +51,9 @@ public class Route extends BaseEntity {
 
     public void linkMember(Member member){
         this.member = member;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 }

@@ -1,5 +1,7 @@
 package org.example.team2backend.domain.route.service.command;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +19,7 @@ import org.example.team2backend.domain.route.exception.RouteErrorCode;
 import org.example.team2backend.domain.route.exception.RouteException;
 import org.example.team2backend.domain.route.repository.RoutePlaceRepository;
 import org.example.team2backend.domain.route.repository.RouteRepository;
+import org.example.team2backend.global.openai.OpenAiService;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -34,6 +37,7 @@ public class RouteCommandService {
     private final RoutePlaceRepository routePlaceRepository;
     private final PlaceRepository placeRepository;
     private final MemberRepository memberRepository;
+    private final OpenAiService openAiService;
 
     //루트 생성
     public void createRoute(RouteReqDTO.CreateRouteDTO createRouteDTO, String email) {
@@ -87,6 +91,11 @@ public class RouteCommandService {
         //루트 만들고 저장
         Route route = toRoute(createRouteDTO);
         route.linkMember(member);
+
+        //AI summary 생성
+        String summary = generateSummaryByAI(newPlaces);
+        route.setSummary(summary);
+
         routeRepository.save(route);
         log.info("[ RouteCommandService ] 루트 생성 후 저장.");
 
@@ -112,4 +121,23 @@ public class RouteCommandService {
         }
         log.info("[ RouteCommandService ] 매핑 테이블 저장 완료.");
     }
+
+    public String generateSummaryByAI(List<RouteReqDTO.PlaceDTO> places) {
+        StringBuilder prompt = new StringBuilder();
+        prompt.append("다음 장소들을 연결한 여행 루트를 한 문장으로 요약해줘:\n");
+
+        for (RouteReqDTO.PlaceDTO p : places) {
+            prompt.append("- ").append(p.placeName()).append(" (").append(p.category()).append(")\n");
+        }
+
+        try {
+            String aiResponse = openAiService.getChatCompletion(prompt.toString());
+            JsonNode root = new ObjectMapper().readTree(aiResponse);
+            return root.get("choices").get(0).get("message").get("content").asText();
+        } catch (Exception e) {
+            log.warn("AI summary 생성 실패, 기본 summary 사용", e);
+            return "사용자 지정 여행 루트";
+        }
+    }
+
 }

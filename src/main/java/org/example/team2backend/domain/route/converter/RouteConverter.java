@@ -16,7 +16,7 @@ public class RouteConverter {
                 .kakaoId(placeDTO.kakaoId())
                 .lat(placeDTO.lat())
                 .lng(placeDTO.lng())
-                .isActive(placeDTO.isActivate())
+                .isActive(placeDTO.isActive())
                 .build();
     }
 
@@ -24,8 +24,9 @@ public class RouteConverter {
         //나머지 필드들은 null or 0으로 초기화
         return Route.builder()
                 .name(createRouteDTO.routeName())
-                .saveCount(0L)
+                .bookmarked(0L)
                 .visitCount(0L)
+                .isBookmarked(false)
                 .build();
     }
 
