@@ -22,4 +22,7 @@ public interface RoutePlaceRepository extends JpaRepository<RoutePlace, Long> {
             @Param("routeIds") List<Long> routeIds,
             @Param("visitOrder") Integer visitOrder
     );
+
+    List<RoutePlace> findByPlace_KakaoIdAndVisitOrder(String kakaoId, int visitOrder);
+
 }

@@ -37,4 +37,6 @@ public interface RouteRepository extends JpaRepository<Route, Long> {
     @Modifying
     @Query("update Route r set r.viewCount = r.viewCount + 1 where r.id = :routeId")
     void increaseViewCount(@Param("routeId") Long routeId);
+
+
 }

@@ -13,6 +13,8 @@ import org.example.team2backend.domain.place.entity.Place;
 import org.example.team2backend.domain.route.dto.response.RouteResDTO;
 import org.example.team2backend.domain.route.entity.Route;
 import org.example.team2backend.domain.route.entity.RoutePlace;
+import org.example.team2backend.domain.route.exception.RouteErrorCode;
+import org.example.team2backend.domain.route.exception.RouteException;
 import org.example.team2backend.domain.route.repository.RoutePlaceRepository;
 import org.example.team2backend.domain.route.repository.RouteRepository;
 import org.example.team2backend.global.openai.OpenAiService;
@@ -34,18 +36,26 @@ public class RouteRecommendationService {
     private final MemberRouteRepository memberRouteRepository;
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public List<RouteResDTO.RouteDTO> recommendRoutes(String address, String email) throws IOException {
+    public List<RouteResDTO.RouteDTO> recommendRoutes(String kakaoId, String address, String email) throws IOException {
 
-        //DB에서 모든 루트 가져오기
-        List<Route> candidates = routeRepository.findAll();
-
+        //Member 가져오기
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
+        //전달 받은 kakaoId와 동일한 장소가 1번 순서로 있는 매핑테이블 조회
+        List<RoutePlace> startPlaces = routePlaceRepository.findByPlace_KakaoIdAndVisitOrder(kakaoId, 1);
+        List<Route> candidates = startPlaces.stream()
+                .map(RoutePlace::getRoute)
+                .toList();
+
+        if (candidates.size() < 5) {
+            throw new RouteException(RouteErrorCode.ROUTE_NOT_ENOUGH);
+        }
+
         //후보 루트를 JSON 형식으로 변환 (RouteDTO 구조 맞게)
         StringBuilder prompt = new StringBuilder();
-        prompt.append("사용자가 현재 위치한 주소: ").append(address).append("\n\n")
-                .append("DB에 저장된 루트 목록(RouteDTO JSON 형식):\n");
+        prompt.append("사용자가 선택한 시작 장소 ").append(address).append("\n\n")
+                .append("\"이 장소가 첫 번째로 포함된 루트 후보들(RouteDTO JSON 형식):\n");
 
         for (Route r : candidates) {
             prompt.append(String.format(

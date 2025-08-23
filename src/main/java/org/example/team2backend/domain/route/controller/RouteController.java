@@ -60,9 +60,11 @@ public class RouteController {
 
         String address = updateReqDTO.address();
 
+        String kakaoId = updateReqDTO.kakaoId();
+
         String email = userDetails.getUsername();
 
-        return CustomResponse.onSuccess(recommendationService.recommendRoutes(address, email));
+        return CustomResponse.onSuccess(recommendationService.recommendRoutes(kakaoId, address, email));
     }
 
 
