@@ -12,7 +12,10 @@ import org.example.team2backend.domain.route.service.query.RouteRecommendationSe
 import org.example.team2backend.global.apiPayload.CustomResponse;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 
@@ -51,7 +54,7 @@ public class RouteController {
 
     //루트 추천
     @Operation(summary = "루트 추천", description = "open ai api를 이용하여 거리를 기반으로, 다음 방문 루트를 추천합니다.")
-    @GetMapping("/recommend")
+    @PostMapping("/recommend")
     public CustomResponse<?> recommendPlaces(
             @RequestBody PlaceReqDTO.UpdateReqDTO updateReqDTO, @AuthenticationPrincipal  UserDetails userDetails) throws IOException {
 

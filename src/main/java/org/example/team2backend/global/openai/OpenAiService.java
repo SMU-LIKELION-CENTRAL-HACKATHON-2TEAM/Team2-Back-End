@@ -14,7 +14,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class OpenAiService {
 
-    @Value("${spring.openai.api-key}")
+    @Value("${openai.api-key}")
     private String apiKey;
 
     private final OkHttpClient client = new OkHttpClient();
@@ -40,6 +40,7 @@ public class OpenAiService {
                 .url(url)
                 .post(requestBody)
                 .addHeader("Authorization", "Bearer " + apiKey)
+                .addHeader("Content-Type", "application/json")
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
