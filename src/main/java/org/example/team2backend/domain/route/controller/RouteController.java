@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.team2backend.domain.place.dto.request.PlaceReqDTO;
-import org.example.team2backend.domain.place.service.command.PlaceCommandService;
 import org.example.team2backend.domain.route.dto.request.RouteReqDTO;
 import org.example.team2backend.domain.route.service.command.RouteCommandService;
 import org.example.team2backend.domain.route.service.query.RouteRecommendationService;
@@ -28,7 +27,6 @@ public class RouteController {
 
     private final RouteCommandService routeCommandService;
     private final RouteRecommendationService recommendationService;
-    private final PlaceCommandService placeCommandService;
 
     //루트 생성
     @Operation(summary = "루트 생성", description = "루트 생성 api 입니다.")
