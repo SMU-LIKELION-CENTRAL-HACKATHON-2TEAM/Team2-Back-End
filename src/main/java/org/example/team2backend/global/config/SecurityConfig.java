@@ -40,6 +40,7 @@ public class SecurityConfig {
             "/api/v1/members/login", //로그인
             "/api/v1/emails", //이메일 인증
             "/api/v1/emails/codes", //인증 코드 검증
+            "/api/v1/members/email", //이메일 중복 검증
             "/swagger-ui/**", //스웨거 관련 기능
             "/v3/api-docs/**", //스웨거 관련 기능
             "/api/v1/places" //장소 등록

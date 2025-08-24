@@ -10,6 +10,8 @@ import org.example.team2backend.domain.member.exception.MemberException;
 import org.example.team2backend.domain.member.repository.MemberRepository;
 import org.example.team2backend.domain.member.repository.MemberRouteRepository;
 import org.example.team2backend.domain.place.entity.Place;
+import org.example.team2backend.domain.place.entity.PlaceImage;
+import org.example.team2backend.domain.place.repository.PlaceImageRepository;
 import org.example.team2backend.domain.route.dto.response.RouteResDTO;
 import org.example.team2backend.domain.route.entity.Route;
 import org.example.team2backend.domain.route.entity.RoutePlace;
@@ -34,6 +36,7 @@ public class RouteRecommendationService {
     private final RoutePlaceRepository routePlaceRepository;
     private final MemberRepository memberRepository;
     private final MemberRouteRepository memberRouteRepository;
+    private final PlaceImageRepository placeImageRepository;
     private final ObjectMapper mapper = new ObjectMapper();
 
     public List<RouteResDTO.RouteDTO> recommendRoutes(String kakaoId, String address, String email) throws IOException {
@@ -117,6 +120,11 @@ public class RouteRecommendationService {
                     List<RouteResDTO.PlaceDTO> places = routePlaces.stream()
                             .map(rp -> {
                                 Place p = rp.getPlace();
+
+                                String imageUrl = placeImageRepository.findFirstByPlace(p)
+                                        .map(PlaceImage::getImageUrl)
+                                        .orElse(null);
+
                                 return new RouteResDTO.PlaceDTO(
                                         p.getId(),
                                         p.getName(),
@@ -125,7 +133,8 @@ public class RouteRecommendationService {
                                         p.getKakaoId(),
                                         p.getLat(),
                                         p.getLng(),
-                                        p.getIsActive()
+                                        p.getIsActive(),
+                                        imageUrl
                                 );
                             })
                             .toList();

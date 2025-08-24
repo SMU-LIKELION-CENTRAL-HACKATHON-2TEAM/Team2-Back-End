@@ -13,7 +13,8 @@ public class RouteResDTO {
             String kakaoId,
             Double lat,
             Double lng,
-            Boolean isActivate
+            Boolean isActivate,
+            String imageUrl
     ) {}
 
     //클라이언트에 넘겨줄 루트 정보

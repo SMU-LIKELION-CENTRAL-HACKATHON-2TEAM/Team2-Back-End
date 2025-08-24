@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.team2backend.domain.member.dto.request.MemberRouteReqDTO;
 import org.example.team2backend.domain.member.service.command.MemberRouteCommandService;
-import org.example.team2backend.domain.member.service.query.MemberQueryService;
 import org.example.team2backend.domain.member.service.query.MemberRouteQueryService;
 import org.example.team2backend.global.apiPayload.CustomResponse;
 import org.example.team2backend.global.security.auth.CustomUserDetails;
@@ -37,7 +36,7 @@ public class MemberRouteController {
     }
 
     @Operation(summary = "루트 스크랩 토글", description = "루트에 스크랩을 취소합니다.")
-    @PostMapping("/me")
+    @PostMapping("/me/{routeId}")
     public CustomResponse<?> updateScrap(@AuthenticationPrincipal CustomUserDetails userDetails,
                                          MemberRouteReqDTO.ScrapRequestDTO scrapRequestDTO) {
 
