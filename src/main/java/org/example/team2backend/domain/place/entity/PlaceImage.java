@@ -19,6 +19,7 @@ public class PlaceImage extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "image_url", columnDefinition = "TEXT")
     private String imageUrl;
 
     private String imageKey;

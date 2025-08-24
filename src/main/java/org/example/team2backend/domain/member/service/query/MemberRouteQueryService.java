@@ -10,6 +10,8 @@ import org.example.team2backend.domain.member.exception.MemberException;
 import org.example.team2backend.domain.member.repository.MemberRepository;
 import org.example.team2backend.domain.member.repository.MemberRouteRepository;
 import org.example.team2backend.domain.place.entity.Place;
+import org.example.team2backend.domain.place.entity.PlaceImage;
+import org.example.team2backend.domain.place.repository.PlaceImageRepository;
 import org.example.team2backend.domain.route.dto.response.RouteResDTO;
 import org.example.team2backend.domain.route.entity.RoutePlace;
 import org.example.team2backend.domain.route.repository.RoutePlaceRepository;
@@ -29,6 +31,7 @@ public class MemberRouteQueryService {
     private final MemberRepository memberRepository;
     private final MemberRouteRepository memberRouteRepository;
     private final RoutePlaceRepository routePlaceRepository;
+    private final PlaceImageRepository placeImageRepository;
 
     //스크랩 루트 조회
     public RouteResDTO.CursorResDTO<RouteResDTO.RouteDTO> getScrapList(
@@ -55,6 +58,11 @@ public class MemberRouteQueryService {
                     List<RouteResDTO.PlaceDTO> places = routePlaces.stream()
                             .map(rp -> {
                                 Place p = rp.getPlace();
+
+                                String imageUrl = placeImageRepository.findFirstByPlace(p)
+                                        .map(PlaceImage::getImageUrl)
+                                        .orElse(null);
+
                                 return new RouteResDTO.PlaceDTO(
                                         p.getId(),
                                         p.getName(),
@@ -63,7 +71,8 @@ public class MemberRouteQueryService {
                                         p.getKakaoId(),
                                         p.getLat(),
                                         p.getLng(),
-                                        p.getIsActive()
+                                        p.getIsActive(),
+                                        imageUrl
                                 );
                             })
                             .toList();

@@ -117,6 +117,8 @@ public class MemberController {
         return CustomResponse.onSuccess("패스워드 수정 완료");
     }
 
+    //이메일 중복 검증
+    @Operation(summary = "이메일 중복 검증 api", description = "이메일 중복 검증 api 입니다.")
     @PostMapping("/email")
     public CustomResponse<String> checkEmail(@RequestBody MemberReqDTO.MailRequestDTO mailRequestDTO) {
         boolean isDuplicate = memberCommandService.checkEmail(mailRequestDTO.email());
