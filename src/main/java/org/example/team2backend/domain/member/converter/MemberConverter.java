@@ -19,6 +19,7 @@ public class MemberConverter {
                 .nickname(signUpRequestDTO.nickname())
                 .role(Roles.ROLE_USER)
                 .socialType(SocialType.CUSTOM)
+                .isDeleted(false)
                 .build();
     }
 

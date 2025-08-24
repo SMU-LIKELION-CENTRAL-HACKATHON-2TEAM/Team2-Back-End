@@ -12,6 +12,7 @@ import org.example.team2backend.global.apiPayload.CustomResponse;
 import org.example.team2backend.global.security.auth.CustomUserDetails;
 import org.example.team2backend.global.security.jwt.JwtDTO;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -83,6 +84,21 @@ public class MemberController {
         memberCommandService.logout(email);
 
         return CustomResponse.onSuccess("로그아웃 완료");
+    }
+
+    @SecurityRequirement(name = "JWT TOKEN")
+    @Operation(summary = "회원 탈퇴", description = "회원 탈퇴 API 입니다.")
+    @DeleteMapping("/me")
+    public CustomResponse<?> deleteMember(@AuthenticationPrincipal UserDetails userDetails) {
+
+        log.info("[ Member Controller ] 회원 탈퇴");
+
+        String email = userDetails.getUsername();
+
+        memberCommandService.delete(email);
+
+        return CustomResponse.onSuccess("회원 탈퇴 완료");
+
     }
 
     //닉네임 변경
