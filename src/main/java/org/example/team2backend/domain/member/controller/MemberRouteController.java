@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/scraps")
+@RequestMapping("/api/v1/members")
 @Tag(name = "Scrap API", description = "루트 스크랩 관련 API by 한민")
 public class MemberRouteController {
 
@@ -24,7 +24,7 @@ public class MemberRouteController {
     private final MemberRouteQueryService memberRouteQueryService;
 
     @Operation(summary = "사용자 스크랩 루트 전체 조회", description = "사용자가 스크랩한 루트 전체를 조회합니다.")
-    @GetMapping("/me")
+    @GetMapping("/me/scraps")
 
     public CustomResponse<?> getScrap(@AuthenticationPrincipal CustomUserDetails userDetails,
                                       @Parameter(description = "커서 (null 또는 0이면 첫 페이지)") @RequestParam(required = false) Long cursor,
@@ -36,7 +36,7 @@ public class MemberRouteController {
     }
 
     @Operation(summary = "루트 스크랩 토글", description = "루트에 스크랩을 취소합니다.")
-    @PostMapping("/me/{routeId}")
+    @PostMapping("/me/scraps/{routeId}")
     public CustomResponse<?> updateScrap(@AuthenticationPrincipal CustomUserDetails userDetails,
                                          MemberRouteReqDTO.ScrapRequestDTO scrapRequestDTO) {
 
