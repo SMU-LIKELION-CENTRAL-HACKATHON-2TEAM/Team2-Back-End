@@ -5,6 +5,9 @@ import org.example.team2backend.domain.member.entity.Member;
 import org.example.team2backend.domain.member.exception.MemberErrorCode;
 import org.example.team2backend.domain.member.exception.MemberException;
 import org.example.team2backend.domain.member.repository.MemberRepository;
+import org.example.team2backend.domain.place.entity.Place;
+import org.example.team2backend.domain.place.entity.PlaceImage;
+import org.example.team2backend.domain.place.repository.PlaceImageRepository;
 import org.example.team2backend.domain.review.converter.ReviewConverter;
 import org.example.team2backend.domain.review.dto.response.ReviewResponseDTO;
 import org.example.team2backend.domain.review.entity.Review;
@@ -40,6 +43,7 @@ public class ReviewQueryService {
     private final MemberRepository memberRepository;
     private final ReviewLikeRepository reviewLikeRepository;
     private final RoutePlaceRepository routePlaceRepository;
+    private final PlaceImageRepository placeImageRepository;
 
     public ReviewResponseDTO.CursorResDTO<ReviewResponseDTO.ReviewResDTO> getReviews(Long routeId, Long cursor, int size, String email) {
         Member member = getMember(email);
@@ -103,8 +107,8 @@ public class ReviewQueryService {
         Slice<Route> slice = routeRepository
                 .findDistinctRoutesWithReviewsByMemberAndIdLessThanOrderByIdDesc(member, effectiveCursorId, pageable);
 
-        // 각 루트의 첫 번째 장소명을 조회
-        Map<Long, String> firstPlaceMap = getFirstPlaceMap(slice.getContent());
+        // 각 루트의 첫 번째 장소명, 이미지을 조회
+        Map<Long, ReviewResponseDTO.StartPlaceInfo> firstPlaceMap = getFirstPlaceInfoMap(slice.getContent());
 
         return ReviewConverter.toMyReviewSliceResponse(slice, firstPlaceMap);
     }
@@ -120,20 +124,30 @@ public class ReviewQueryService {
         return memberRepository.findByEmail(email).orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
 
-    private Map<Long, String> getFirstPlaceMap(List<Route> routes) {
+    private Map<Long, ReviewResponseDTO.StartPlaceInfo> getFirstPlaceInfoMap(List<Route> routes) {
         List<Long> routeIds = routes.stream()
                 .map(Route::getId)
                 .toList();
 
-        // RoutePlace에서 visitOrder = 1인 것들을 일괄 조회
-        List<RoutePlace> firstPlaces = routePlaceRepository
-                .findByRouteIdInAndVisitOrder(routeIds, 1);
+        // RoutePlace에서 visitOrder = 1 인 것들을 조회
+        List<RoutePlace> firstPlaces = routePlaceRepository.findByRouteIdInAndVisitOrder(routeIds, 1);
 
         return firstPlaces.stream()
                 .collect(Collectors.toMap(
                         rp -> rp.getRoute().getId(),
-                        rp -> rp.getPlace().getName(),
-                        (existing, replacement) -> existing // 중복시 기존값 유지
+                        rp -> {
+                            Place place = rp.getPlace();
+
+                            // placeImageRepository를 사용해서 첫 이미지 조회
+                            String imageUrl = placeImageRepository.findFirstByPlace(place)
+                                    .map(PlaceImage::getImageUrl)
+                                    .orElse(null);
+
+                            return new ReviewResponseDTO.StartPlaceInfo(place.getName(), imageUrl);
+                        },
+                        (existing, replacement) -> existing
                 ));
     }
+
+
 }

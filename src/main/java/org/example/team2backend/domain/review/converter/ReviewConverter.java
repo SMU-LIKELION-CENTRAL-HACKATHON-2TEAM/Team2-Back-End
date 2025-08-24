@@ -59,11 +59,12 @@ public class ReviewConverter {
                 .build();
     }
 
-    public static ReviewResponseDTO.MyReviewResDTO toMyReviewResDTO(Route route, String startPlace) {
+    public static ReviewResponseDTO.MyReviewResDTO toMyReviewResDTO(Route route, String startPlace, String imageUrl) {
         return ReviewResponseDTO.MyReviewResDTO.builder()
                 .routeId(route.getId())
                 .name(route.getName())
                 .startPlace(startPlace)
+                .imageUrl(imageUrl)
                 .createdAt(route.getCreatedAt())
                 .updatedAt(route.getUpdatedAt())
                 .build();
@@ -91,10 +92,13 @@ public class ReviewConverter {
     }
     public static ReviewResponseDTO.CursorResDTO<ReviewResponseDTO.MyReviewResDTO> toMyReviewSliceResponse(
             Slice<Route> slice,
-            Map<Long, String> firstPlaceMap
+            Map<Long, ReviewResponseDTO.StartPlaceInfo> firstPlaceMap
     ) {
         List<ReviewResponseDTO.MyReviewResDTO> dtos = slice.getContent().stream()
-                .map(route -> toMyReviewResDTO(route, firstPlaceMap.getOrDefault(route.getId(), "장소 없음")))
+                .map(route -> {
+                    ReviewResponseDTO.StartPlaceInfo info = firstPlaceMap.getOrDefault(route.getId(), new ReviewResponseDTO.StartPlaceInfo("장소 없음", null));
+                    return toMyReviewResDTO(route, info.name(), info.imageUrl());
+                })
                 .toList();
 
         Long nextCursor = slice.hasNext()
@@ -107,4 +111,5 @@ public class ReviewConverter {
                 .nextCursor(nextCursor)
                 .build();
     }
+
 }
