@@ -51,6 +51,7 @@ public class RouteRecommendationService {
                 .map(RoutePlace::getRoute)
                 .toList();
 
+        //후보에 올라온 루트의 개수가 5개보다 적으면
         if (candidates.size() < 5) {
             throw new RouteException(RouteErrorCode.ROUTE_NOT_ENOUGH);
         }

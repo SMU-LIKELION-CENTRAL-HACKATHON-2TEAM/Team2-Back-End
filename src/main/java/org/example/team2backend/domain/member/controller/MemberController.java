@@ -86,6 +86,7 @@ public class MemberController {
         return CustomResponse.onSuccess("로그아웃 완료");
     }
 
+    //회원 탈퇴
     @SecurityRequirement(name = "JWT TOKEN")
     @Operation(summary = "회원 탈퇴", description = "회원 탈퇴 API 입니다.")
     @DeleteMapping("/me")
@@ -134,7 +135,7 @@ public class MemberController {
     }
 
     //이메일 중복 검증
-    @Operation(summary = "이메일 중복 검증 api", description = "이메일 중복 검증 api 입니다.")
+    @Operation(summary = "이메일 중복 검증", description = "이메일 중복 검증 API 입니다.")
     @PostMapping("/email")
     public CustomResponse<String> checkEmail(@RequestBody MemberReqDTO.MailRequestDTO mailRequestDTO) {
         boolean isDuplicate = memberCommandService.checkEmail(mailRequestDTO.email());

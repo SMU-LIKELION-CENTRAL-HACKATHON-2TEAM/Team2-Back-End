@@ -18,6 +18,7 @@ public class CorsConfig implements WebMvcConfigurer {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
+                "http://127.0.0.1:5501",
                 "http://localhost:3000/",
                 "http://localhost:8080",
                 "https://api-ieum.store",
