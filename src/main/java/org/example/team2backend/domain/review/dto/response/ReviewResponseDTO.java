@@ -36,10 +36,12 @@ public class ReviewResponseDTO {
             Long routeId,
             String name,
             String startPlace,
-            //TODO : 루트 사진 ( 첫번째 장소 사진 ) 추가
+            String imageUrl,
             LocalDateTime createdAt,
             LocalDateTime updatedAt
     ) {}
+
+    public record StartPlaceInfo(String name, String imageUrl) {}
 
 
     @Builder

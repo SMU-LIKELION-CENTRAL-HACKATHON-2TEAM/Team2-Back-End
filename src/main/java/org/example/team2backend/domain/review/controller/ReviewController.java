@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.example.team2backend.domain.review.dto.request.ReviewRequestDTO;
 import org.example.team2backend.domain.review.dto.response.ReviewResponseDTO;
 import org.example.team2backend.domain.review.service.command.ReviewCommandService;
 import org.example.team2backend.domain.review.service.query.ReviewQueryService;
@@ -28,11 +29,11 @@ public class ReviewController {
     @Operation(summary = "리뷰 작성", description = "특정 루트에 리뷰를 작성합니다.")
     @PostMapping(value = "/{routeId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public CustomResponse<ReviewResponseDTO.ReviewCreateResDTO> createReview(
-            @Parameter(description = "리뷰 내용") @RequestPart("content") String content,
+            @Parameter(description = "리뷰 내용") @RequestPart ReviewRequestDTO.CreateReviewRequestDTO request,
             @Parameter(description = "리뷰 이미지 (선택)") @RequestPart(value = "images", required = false) List<MultipartFile> images,
             @Parameter(description = "루트 ID") @PathVariable Long routeId,
             @AuthenticationPrincipal UserDetails userDetails){
-        return CustomResponse.onSuccess(reviewCommandService.createReview(content, images, userDetails.getUsername(), routeId));
+        return CustomResponse.onSuccess(reviewCommandService.createReview(request.content(), images, userDetails.getUsername(), routeId));
     }
 
     @Operation(summary = "리뷰 조회", description = "특정 루트의 리뷰 목록을 커서 기반 페이지네이션으로 조회합니다.")
