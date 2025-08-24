@@ -41,20 +41,11 @@ public class RouteController {
         return CustomResponse.onSuccess("루트 생성 성공");
     }
 
-    //루트 단건 조회
-    /*@Operation(summary = "루트 단건 조회 api", description = "루트 단건 조회 api 입니다.")
-    @GetMapping("{kakaoId}")
-    public List<RouteResDTO.PlaceDTO> getPlaces(@PathVariable Long kakaoId) {
-
-        return routeQueryService.getPlacesByRouteId(kakaoId)
-                .stream()
-                .map(RouteConverter::fromEntity)
-                .toList();
-    }*/
-
     //루트 추천
-    @Operation(summary = "루트 추천", description = "open ai api를 이용하여 거리를 기반으로, 다음 방문 루트를 추천합니다.")
-    @PostMapping("/recommend")
+    @Operation(summary = "루트 추천", description = """
+            open ai api를 이용하여 입력한 장소를 기반으로, 다음 방문 루트를 추천합니다.
+            """)
+    @PostMapping("/recommendations")
     public CustomResponse<?> recommendPlaces(
             @RequestBody PlaceReqDTO.UpdateReqDTO updateReqDTO, @AuthenticationPrincipal  UserDetails userDetails) throws IOException {
 
