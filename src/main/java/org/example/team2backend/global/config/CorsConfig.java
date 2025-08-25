@@ -29,7 +29,8 @@ public class CorsConfig implements WebMvcConfigurer {
                 "https://api-ieum.store",
                 "http://api-ieum.store",
                 "https://www.api-ieum.store",
-                "http://www.api-ieum.store"
+                "http://www.api-ieum.store",
+                "https://team2-front-end.vercel.app/"
         ));
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));

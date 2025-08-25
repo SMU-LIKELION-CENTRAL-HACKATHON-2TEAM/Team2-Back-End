@@ -31,6 +31,7 @@ public class PlaceConverter {
         place.setIsActive(updateReqDTO.isActive());
     }
 
+
     public static PlaceImage toPlaceImage(String imageKey, String imageUrl, Place place) {
         return PlaceImage.builder()
                 .imageKey(imageKey)
