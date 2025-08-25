@@ -23,11 +23,11 @@ public class MailController {
     private final MemberQueryService memberQueryService;
 
     @Operation(summary = "인증 코드 발급", description = "인증 코드 발급 API 입니다.")
-    @PostMapping("")
-    public CustomResponse<String> sendCode(@RequestBody MemberReqDTO.MailRequestDTO mailRequestDTO)
+    @GetMapping("")
+    public CustomResponse<String> sendCode(@RequestParam String email)
             throws MessagingException {
 
-        mailCommandService.sendSimpleMessage(mailRequestDTO.email());
+        mailCommandService.sendSimpleMessage(email);
 
         return CustomResponse.onSuccess("해당 이메일로 인증 코드를 발급했습니다.");
     }
