@@ -129,7 +129,7 @@ public class MemberController {
 
         String email = userDetails.getUsername();
 
-        memberCommandService.updatePassword(email, updatePasswordDTO);
+        memberCommandService.updatePassword(email, updatePasswordDTO, passwordEncoder);
 
         return CustomResponse.onSuccess("패스워드 수정 완료");
     }

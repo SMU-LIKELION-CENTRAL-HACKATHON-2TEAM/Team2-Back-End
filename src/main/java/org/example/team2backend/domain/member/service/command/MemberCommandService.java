@@ -163,7 +163,8 @@
 
         //패스워드 변경
         public void updatePassword(String email,
-                                   MemberReqDTO.UpdatePasswordDTO updatePasswordDTO) {
+                                   MemberReqDTO.UpdatePasswordDTO updatePasswordDTO,
+                                   PasswordEncoder passwordEncoder) {
 
             String newPassword = updatePasswordDTO.newPassword();
 
@@ -179,7 +180,7 @@
                 throw new CustomException(PASSWORD_UNCHANGED);
             }
 
-            memberRepository.updatePasswordByEmail(email, newPassword);
+            memberRepository.updatePasswordByEmail(email, passwordEncoder.encode(newPassword));
         }
 
         public boolean checkEmail(String email) {
