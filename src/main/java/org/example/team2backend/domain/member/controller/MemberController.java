@@ -44,7 +44,7 @@ public class MemberController {
     @PostMapping("/login")
     public CustomResponse<?> login(@RequestBody MemberReqDTO.LoginRequestDTO loginRequestDTO) {
 
-        return CustomResponse.onSuccess(memberCommandService.login(loginRequestDTO));
+        return CustomResponse.onSuccess(null);
     }
 
     //토큰 재발급

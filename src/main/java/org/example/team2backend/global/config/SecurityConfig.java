@@ -54,6 +54,8 @@ public class SecurityConfig {
                 jwtUtil
         );
 
+
+        loginFilter.setFilterProcessesUrl("/api/v1/members/login");
         http
                 //요청 url별  접근 권한 설정
                 .authorizeHttpRequests(request -> request
@@ -64,7 +66,7 @@ public class SecurityConfig {
                 //jwt인증 필터를 UsernamePasswordAuthenticationFilter 앞에 등록 -> 매 요청마다 jwt 유효성 검사하겠음
                 .addFilterBefore(new JwtAuthorizationFilter(jwtUtil, customUserDetailsService), UsernamePasswordAuthenticationFilter.class)
                 //로그인 필터 등록 -> 아이디, 비밀번호 검증 후 jwt 발급(지금은 스웨거 테스트 때문에 주석처리)
-                //.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
                 //기본 로그인 페이지 비활성화 (우리는 restapi로 처리하겠다.)
                 .formLogin(AbstractHttpConfigurer::disable)
                 //http basic 인증 비활성화
